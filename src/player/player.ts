@@ -1,3 +1,5 @@
+import JobMods from "../jobs/jobmods";
+
 export interface Player {
     stats: {
         mainStat: number,
@@ -6,6 +8,8 @@ export interface Player {
         det: number,
         dhit: number,
         spellSpeed: number,
-        skillSpeed: number
-    }
+        skillSpeed: number,
+        tenacity: number
+    },
+    jobMod: JobMods
 }
