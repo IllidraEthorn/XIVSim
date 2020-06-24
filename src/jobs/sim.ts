@@ -1,6 +1,8 @@
 import { LevelMod } from "../consts/levelmod";
 import { Player } from "../player/player";
 import Skill from "./skill";
+import AutoAttack from "./autoattack";
+import { calcDamage, critChance, directHitChance, critDamageBonus, calcAutoAttackDamage } from "../util/damagecalc";
 
 export interface DamageLog {
     name: string
@@ -14,7 +16,7 @@ export default abstract class Sim {
     player: Player;
     levelMod: LevelMod;
     printLog: boolean;
-    currentTime: number;
+    private currentTime: number;
     maxTime: number;
     damageDealt: number;
     gcdTimer: number;
@@ -55,19 +57,59 @@ export default abstract class Sim {
     summary(): any {
         return {
             totalDamage: this.damageDealt,
-            dps: this.damageDealt / this.currentTime,
+            dps: (this.damageDealt / this.currentTime).toFixed(2),
             duration: this.currentTime,
             totalActions: this.log.length
         }
     }
 
+    getCurrentTime(): number {
+        return this.currentTime
+    }
+
+    useAutoAttack(autoAttack: AutoAttack): DamageLog {
+        const timeToLog = this.getCurrentTime();
+
+        const baseDamage: number = calcAutoAttackDamage(autoAttack.potency, this.levelMod, this.player.jobMod.autoAttackStat(), this.player.stats.weaponDamage, autoAttack.autoAttackDelay, this.player.stats.mainStat, this.player.stats.det, this.player.stats.tenacity, 1, this.player.stats.skillSpeed)
+        const critC: number = critChance(this.levelMod, this.player.stats.crit) / 100 + this.calcCritChanceFromBuffs();
+        const dhitC: number = directHitChance(this.levelMod, this.player.stats.dhit) / 100 + this.calcDHitChanceFromBuffs();
+
+        let damage: number = baseDamage
+        let chit = false
+        let dhit = false;
+
+        if (Math.random() <= critC) {
+            damage = Math.floor(damage * critDamageBonus(this.levelMod, this.player.stats.crit));
+            chit = true;
+        }
+
+        if (Math.random() <= dhitC) {
+            damage = Math.floor(damage * 1.25);
+            dhit = true;
+        }
+
+        const damageLog: DamageLog = {
+            name: "Auto Attack",
+            damage: damage,
+            directHit: dhit,
+            crit: chit,
+            timestamp: timeToLog
+        }
+
+        this.log.push(damageLog);
+
+        return damageLog
+    }
+
     abstract calcCritChanceFromBuffs(): number;
+
+    abstract calcDHitChanceFromBuffs(): number;
 
     abstract printDamageLogLine(damageLog: DamageLog): void;
 
     abstract getNextGCD(): Skill;
 
-    abstract getNextAction(): Skill;
+    abstract doNextAction(): DamageLog;
 
     abstract run(): void;
 }

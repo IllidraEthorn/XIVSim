@@ -8,11 +8,9 @@ export default interface JobMods {
     dex: number,
     int: number,
     mnd: number,
-    mainStat: MainStat
-}
+    mainStat(): number,
+    autoAttackStat(): number
 
-interface MainStat {
-    (): number
 }
 
 const jobMods = {

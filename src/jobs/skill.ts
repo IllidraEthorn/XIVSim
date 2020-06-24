@@ -14,4 +14,6 @@ export default interface Skill {
     //Set to true if this skill interacts with your combo (Is a combo action or can break your combo)
     //True for Cascade, but False for Reverse Cascade and Bloodspiller
     comboInteraction?: boolean
+
+    onUse?(state: any): any
 }

@@ -1,5 +1,6 @@
 import JobMods from "../jobmods";
 import Skill from "../skill";
+import AutoAttack from "../autoattack";
 
 const jobMods: JobMods = {
     hp: 105,
@@ -11,19 +12,18 @@ const jobMods: JobMods = {
     mnd: 80,
     mainStat: () => {
         return jobMods.dex
+    },
+    autoAttackStat: () => {
+        return jobMods.dex
     }
 }
 
 const globalTraitMult: number = 1.2
 
-const autoAttack: Skill = {
-    name: "Auto Attack",
-    baseCastTime: 0,
-    baseRecastTime: 0,
-    potency: 100,
+const autoAttack: AutoAttack = {
+    potency: 110,
     traitDamageMult: globalTraitMult,
-    isGCD: false,
-    comboInteraction: false
+    autoAttackDelay: 3.12
 }
 
 const cascade: Skill = {
@@ -43,3 +43,4 @@ const skills = {
 
 export { jobMods as dancerJobMods }
 export { skills as dancerSkills }
+export { autoAttack as dancerAutoAttack }
