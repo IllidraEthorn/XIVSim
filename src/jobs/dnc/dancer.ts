@@ -19,7 +19,8 @@ const cascade: Skill = {
     baseCastTime: 0,
     baseRecastTime: 2.5,
     potency: 250,
-    traitDamageMult: 1.2
+    traitDamageMult: 1.2,
+    comboInteraction: true
 }
 
 const skills = {
