@@ -2,6 +2,13 @@ import Skill from "./skill";
 import { Player } from "../player/player";
 import { LevelMod } from "../consts/levelmod";
 
+export interface DamageLog {
+    name: string
+    damage: number
+    directHit: boolean
+    crit: boolean
+}
+
 export default abstract class Sim {
     player: Player;
     levelMod: LevelMod;
@@ -9,7 +16,7 @@ export default abstract class Sim {
     currentTime: number;
     maxTime: number;
     damageDealt: number;
-    gcdTimer: number
+    gcdTimer: number;
 
     constructor(player: Player, levelMod: LevelMod, maxTime: number, printLog?: boolean) {
         this.player = player
@@ -18,6 +25,7 @@ export default abstract class Sim {
         this.currentTime = 0
         this.maxTime = maxTime
         this.damageDealt = 0;
+        this.gcdTimer = 0;
     }
 
     dealDamage(damage: number): void {
@@ -29,5 +37,11 @@ export default abstract class Sim {
         this.gcdTimer = 0;
     }
 
+    abstract calcCritChanceFromBuffs(): number;
+
+    abstract printDamageLogLine(damageLog: DamageLog): void;
+
     abstract getNextGCD(): Skill;
+
+    abstract run(): void;
 }
