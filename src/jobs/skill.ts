@@ -4,7 +4,9 @@ export default interface Skill {
     baseRecastTime: number
     potency: number
     traitDamageMult: number
-    
+
+    //Does this skill trigger the gcd?
+    isGCD: boolean
     //Combo Stuff
     comboPotency?: number
     //Use an array because some jobs have multiple combo actions

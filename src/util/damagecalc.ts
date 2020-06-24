@@ -1,4 +1,4 @@
-import levelMod80, { LevelMod } from "../consts/levelmod";
+import { LevelMod } from "../consts/levelmod";
 import randomRange from "./randomRange";
 
 //All functions were made using information taken from http://allaganstudies.akhmorning.com/
@@ -51,4 +51,4 @@ const calcDamageRange = (potency: number, levelMod: LevelMod, jobMod: number, we
     return `${calcDamage(potency, levelMod, jobMod, weaponDamage, attackPower, determination, tenacity, traitMult, 0.95)} - ${calcDamage(potency, levelMod, jobMod, weaponDamage, attackPower, determination, tenacity, traitMult, 1.05)}`
 }
 
-export { directHitChance, critChance, critDamageBonus, calcDamage }
+export { directHitChance, critChance, critDamageBonus, calcDamage };

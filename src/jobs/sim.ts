@@ -1,12 +1,13 @@
-import Skill from "./skill";
-import { Player } from "../player/player";
 import { LevelMod } from "../consts/levelmod";
+import { Player } from "../player/player";
+import Skill from "./skill";
 
 export interface DamageLog {
     name: string
     damage: number
     directHit: boolean
     crit: boolean
+    timestamp: number
 }
 
 export default abstract class Sim {
@@ -17,6 +18,8 @@ export default abstract class Sim {
     maxTime: number;
     damageDealt: number;
     gcdTimer: number;
+    autoAttackTimer: number;
+    log: Array<DamageLog>;
 
     constructor(player: Player, levelMod: LevelMod, maxTime: number, printLog?: boolean) {
         this.player = player
@@ -24,8 +27,10 @@ export default abstract class Sim {
         this.printLog = printLog
         this.currentTime = 0
         this.maxTime = maxTime
-        this.damageDealt = 0;
-        this.gcdTimer = 0;
+        this.damageDealt = 0
+        this.gcdTimer = 0
+        this.autoAttackTimer = 0
+        this.log = []
     }
 
     dealDamage(damage: number): void {
@@ -33,8 +38,27 @@ export default abstract class Sim {
     }
 
     jumpToNextGCD(): void {
-        this.currentTime += this.gcdTimer;
-        this.gcdTimer = 0;
+        this.jumpTimeBy(this.gcdTimer);
+    }
+
+    jumpToAutoAttack(): void {
+        this.jumpTimeBy(this.autoAttackTimer);
+    }
+
+    //Jumps forward in time, updating the auto attack timer and gcd timer
+    jumpTimeBy(time: number): void {
+        this.currentTime += time
+        this.gcdTimer = Math.max(this.gcdTimer - time, 0)
+        this.autoAttackTimer = Math.max(this.autoAttackTimer - time, 0)
+    }
+
+    summary(): any {
+        return {
+            totalDamage: this.damageDealt,
+            dps: this.damageDealt / this.currentTime,
+            duration: this.currentTime,
+            totalActions: this.log.length
+        }
     }
 
     abstract calcCritChanceFromBuffs(): number;
@@ -42,6 +66,8 @@ export default abstract class Sim {
     abstract printDamageLogLine(damageLog: DamageLog): void;
 
     abstract getNextGCD(): Skill;
+
+    abstract getNextAction(): Skill;
 
     abstract run(): void;
 }

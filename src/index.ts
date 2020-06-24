@@ -1,10 +1,7 @@
 import levelMod80 from "./consts/levelmod";
-import { Player } from "./player/player";
-import { printSkillDamageRanges } from "./util/printDamageRanges";
-import { jobMods } from "./jobs/jobmods";
-import { dancerSkills } from "./jobs/dnc/dancer";
-import { critChance, directHitChance } from "./util/damagecalc";
 import DNCSim from "./jobs/dnc/sim";
+import { jobMods } from "./jobs/jobmods";
+import { Player } from "./player/player";
 
 const dancer: Player = {
     stats: {
@@ -42,6 +39,7 @@ printSkillDamageRanges(dancerSkills.cascade, levelMod80, dancer)
 console.log("Crit chance: ", critC/100)
 console.log("DHit chance: ", dhitC/100)*/
 
-let sim: DNCSim = new DNCSim(dancer, levelMod80, 10, true);
+let sim: DNCSim = new DNCSim(dancer, levelMod80, 60, true);
 
 sim.run();
+console.log(sim.summary());

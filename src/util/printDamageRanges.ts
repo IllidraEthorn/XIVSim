@@ -1,7 +1,7 @@
-import levelMod80, { LevelMod } from "../consts/levelmod";
+import { LevelMod } from "../consts/levelmod";
+import Skill from "../jobs/skill";
 import { Player } from "../player/player";
 import { calcDamage, critDamageBonus } from "./damagecalc";
-import Skill from "../jobs/skill";
 
 const printSkillDamageRanges = (skill: Skill, levelMod: LevelMod, player: Player): void => {
     console.log(skill.name, ":");
@@ -34,4 +34,4 @@ const printDamageRanges = (potency: number, levelMod: LevelMod, player: Player, 
     console.log(damageRanges)
 }
 
-export { printDamageRanges, printSkillDamageRanges }
+export { printDamageRanges, printSkillDamageRanges };

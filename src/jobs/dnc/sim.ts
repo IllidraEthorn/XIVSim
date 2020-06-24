@@ -1,9 +1,9 @@
+import { LevelMod } from "../../consts/levelmod";
+import { Player } from "../../player/player";
+import { calcDamage, critChance, critDamageBonus, directHitChance } from "../../util/damagecalc";
 import Sim, { DamageLog } from "../sim";
 import Skill from "../skill";
 import { dancerSkills } from "./dancer";
-import { Player } from "../../player/player";
-import { LevelMod } from "../../consts/levelmod";
-import { calcDamage, critChance, directHitChance, critDamageBonus } from "../../util/damagecalc";
 
 export default class DNCSim extends Sim {
 
@@ -16,17 +16,16 @@ export default class DNCSim extends Sim {
         this.dhitFromBuffs = 0;
     }
 
-    test(): void {
-        this.maxTime
-    }
-
     getNextGCD(): Skill {
         return dancerSkills.cascade
     }
 
     useSkill(skill: Skill): DamageLog {
-        this.jumpToNextGCD();
-        this.gcdTimer = skill.baseRecastTime
+        const timeToLog = this.currentTime;
+        if (skill.isGCD) {
+            this.jumpToNextGCD();
+            this.gcdTimer = skill.baseRecastTime;
+        }
 
         const baseDamage: number = calcDamage(skill.potency, this.levelMod, this.player.jobMod.mainStat(), this.player.stats.weaponDamage, this.player.stats.mainStat, this.player.stats.det, this.player.stats.tenacity, 1.2)
         const critC: number = critChance(this.levelMod, this.player.stats.crit) / 100 + this.calcCritChanceFromBuffs();
@@ -43,16 +42,20 @@ export default class DNCSim extends Sim {
 
         if (Math.random() <= dhitC) {
             damage *= 1.25;
-            dhit = false;
+            dhit = true;
         }
 
-        return {
+        const damageLog: DamageLog = {
             name: skill.name,
             damage: damage,
             directHit: dhit,
-            crit: chit
+            crit: chit,
+            timestamp: timeToLog
         }
 
+        this.log.push(damageLog);
+
+        return damageLog
     }
 
     calcCritChanceFromBuffs(): number {
@@ -64,7 +67,7 @@ export default class DNCSim extends Sim {
     }
 
     printDamageLogLine(damageLog: DamageLog): void {
-        let logLine: string = `${damageLog.name} : ${damageLog.damage}`;
+        let logLine: string = `${damageLog.timestamp.toFixed(1).padStart(4, '0')}|${damageLog.name} : ${damageLog.damage}`;
 
         if (damageLog.crit) {
             logLine += " (Critical Hit)"
@@ -76,6 +79,12 @@ export default class DNCSim extends Sim {
         console.log(logLine);
     }
 
+    //Figure out if we should do a gcd, ogcd, etc
+    getNextAction(): Skill {
+        return dancerSkills.cascade
+    }
+
+    //Perform the next gcd
     doNextGCD(): DamageLog {
         const damageLog: DamageLog = this.useSkill(this.getNextGCD())
 
@@ -84,10 +93,16 @@ export default class DNCSim extends Sim {
         return damageLog;
     }
 
+    //Perform an auto attack
+    doAutoAttack(): DamageLog {
+
+    }
+
     run(): void {
-        while (this.currentTime <= 10) {
-            console.log("Time: ", this.currentTime)
-            this.printDamageLogLine(this.doNextGCD());
+        let damageLog: DamageLog;
+        while (this.currentTime < this.maxTime) {
+            damageLog = this.doNextGCD();
+            this.printDamageLogLine(damageLog);
         }
     }
 }
