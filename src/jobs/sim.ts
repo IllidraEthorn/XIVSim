@@ -7,9 +7,11 @@ import { calcDamage, critChance, directHitChance, critDamageBonus, calcAutoAttac
 export interface DamageLog {
     name: string
     damage: number
+    potency: number
     directHit: boolean
     crit: boolean
     timestamp: number
+    comment?: string
 }
 
 export default abstract class Sim {
@@ -21,6 +23,7 @@ export default abstract class Sim {
     damageDealt: number;
     gcdTimer: number;
     autoAttackTimer: number;
+    comboAction: Skill;
     log: Array<DamageLog>;
 
     constructor(player: Player, levelMod: LevelMod, maxTime: number, printLog?: boolean) {
@@ -67,10 +70,54 @@ export default abstract class Sim {
         return this.currentTime
     }
 
+    useSkill(skill: Skill): DamageLog {
+        const timeToLog = this.getCurrentTime();
+
+        let potency = skill.potency;
+        if (skill.comboPotency && skill.comboActions?.includes(this.comboAction)) {
+            potency = skill.comboPotency
+        }
+
+        const baseDamage: number = calcDamage(potency, this.levelMod, this.player.jobMod.mainStat(), this.player.stats.weaponDamage, this.player.stats.mainStat, this.player.stats.det, this.player.stats.tenacity, 1.2)
+        const critC: number = critChance(this.levelMod, this.player.stats.crit) / 100 + this.calcCritChanceFromBuffs();
+        const dhitC: number = directHitChance(this.levelMod, this.player.stats.dhit) / 100 + this.calcDHitChanceFromBuffs();
+
+        let damage: number = baseDamage
+        let chit = false
+        let dhit = false;
+
+        if (Math.random() <= critC) {
+            damage = Math.floor(damage * critDamageBonus(this.levelMod, this.player.stats.crit));
+            chit = true;
+        }
+
+        if (Math.random() <= dhitC) {
+            damage = Math.floor(damage * 1.25);
+            dhit = true;
+        }
+
+        const damageLog: DamageLog = {
+            name: skill.name,
+            damage: damage,
+            potency: potency,
+            directHit: dhit,
+            crit: chit,
+            timestamp: timeToLog
+        }
+
+        this.log.push(damageLog);
+
+        if(skill.comboInteraction){
+            this.comboAction = skill;
+        }
+
+        return damageLog
+    }
+
     useAutoAttack(autoAttack: AutoAttack): DamageLog {
         const timeToLog = this.getCurrentTime();
 
-        const baseDamage: number = calcAutoAttackDamage(autoAttack.potency, this.levelMod, this.player.jobMod.autoAttackStat(), this.player.stats.weaponDamage, autoAttack.autoAttackDelay, this.player.stats.mainStat, this.player.stats.det, this.player.stats.tenacity, 1, this.player.stats.skillSpeed)
+        const baseDamage: number = calcAutoAttackDamage(autoAttack.potency, this.levelMod, this.player.jobMod.autoAttackStat(), this.player.stats.weaponDamage, autoAttack.autoAttackDelay, this.player.stats.mainStat, this.player.stats.det, this.player.stats.tenacity, autoAttack.traitDamageMult, this.player.stats.skillSpeed)
         const critC: number = critChance(this.levelMod, this.player.stats.crit) / 100 + this.calcCritChanceFromBuffs();
         const dhitC: number = directHitChance(this.levelMod, this.player.stats.dhit) / 100 + this.calcDHitChanceFromBuffs();
 
@@ -91,6 +138,7 @@ export default abstract class Sim {
         const damageLog: DamageLog = {
             name: "Auto Attack",
             damage: damage,
+            potency: autoAttack.potency,
             directHit: dhit,
             crit: chit,
             timestamp: timeToLog

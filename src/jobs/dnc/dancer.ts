@@ -22,7 +22,7 @@ const globalTraitMult: number = 1.2
 
 const autoAttack: AutoAttack = {
     potency: 110,
-    traitDamageMult: globalTraitMult,
+    traitDamageMult: 1.0,
     autoAttackDelay: 3.12
 }
 
@@ -36,9 +36,22 @@ const cascade: Skill = {
     comboInteraction: true
 }
 
+const fountain: Skill = {
+    name: "Fountain",
+    baseCastTime: 0,
+    baseRecastTime: 2.5,
+    potency: 100,
+    comboPotency: 300,
+    comboActions: [cascade],
+    traitDamageMult: globalTraitMult,
+    isGCD: true,
+    comboInteraction: true
+}
+
 const skills = {
     autoAttack,
-    cascade
+    cascade,
+    fountain
 }
 
 export { jobMods as dancerJobMods }
