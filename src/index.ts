@@ -40,7 +40,7 @@ printSkillDamageRanges(dancerSkills.cascade, levelMod80, dancer)
 console.log("Crit chance: ", critC/100)
 console.log("DHit chance: ", dhitC/100)*/
 
-let sim: DNCSim = new DNCSim(dancer, levelMod80, 30, [dancerSkills.cascade, dancerSkills.fountain, dancerSkills.fountain, dancerSkills.cascade]);
+let sim: DNCSim = new DNCSim(dancer, levelMod80, 30, [dancerSkills.cascade, dancerSkills.fountain, dancerSkills.fountain, dancerSkills.fountain]);
 
 sim.run();
 sim.log.forEach((damageLog) => { sim.printDamageLogLine(damageLog) });

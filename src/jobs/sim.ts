@@ -23,6 +23,7 @@ export default abstract class Sim {
     damageDealt: number;
     gcdTimer: number;
     autoAttackTimer: number;
+    comboTimer: number;
     comboAction: Skill;
     log: Array<DamageLog>;
 
@@ -34,6 +35,7 @@ export default abstract class Sim {
         this.maxTime = maxTime
         this.damageDealt = 0
         this.gcdTimer = 0
+        this.comboTimer = 0
         this.autoAttackTimer = 0
         this.log = []
     }
@@ -55,6 +57,7 @@ export default abstract class Sim {
         this.currentTime += time
         this.gcdTimer = Math.max(this.gcdTimer - time, 0)
         this.autoAttackTimer = Math.max(this.autoAttackTimer - time, 0)
+        this.comboTimer = Math.max(this.comboTimer - time, 0)
     }
 
     summary(): any {
@@ -74,8 +77,9 @@ export default abstract class Sim {
         const timeToLog = this.getCurrentTime();
 
         let potency = skill.potency;
-        if (skill.comboPotency && skill.comboActions?.includes(this.comboAction)) {
+        if (skill.comboPotency && this.comboTimer > 0 && skill.comboActions?.includes(this.comboAction)) {
             potency = skill.comboPotency
+            this.comboTimer = 0
         }
 
         const baseDamage: number = calcDamage(potency, this.levelMod, this.player.jobMod.mainStat(), this.player.stats.weaponDamage, this.player.stats.mainStat, this.player.stats.det, this.player.stats.tenacity, 1.2)
@@ -107,8 +111,9 @@ export default abstract class Sim {
 
         this.log.push(damageLog);
 
-        if(skill.comboInteraction){
+        if (skill.comboInteraction) {
             this.comboAction = skill;
+            this.comboTimer = 10;
         }
 
         return damageLog
