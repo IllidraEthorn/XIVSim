@@ -57,3 +57,4 @@ const calcDamageRange = (potency: number, levelMod: LevelMod, jobMod: number, we
 }
 
 export { directHitChance, critChance, critDamageBonus, calcAutoAttackDamage, calcDamage };
+

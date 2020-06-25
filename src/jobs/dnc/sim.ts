@@ -1,9 +1,10 @@
 import { LevelMod } from "../../consts/levelmod";
 import { Player } from "../../player/player";
+import AutoAttack from "../autoattack";
 import Proc from "../proc";
 import Sim, { DamageLog } from "../sim";
 import Skill from "../skill";
-import { dancerAutoAttack, dancerSkills } from "./dancer";
+import { dancerAutoAttack, dancerProcs, dancerSkills } from "./dancer";
 
 export class DancerState {
     private esprit: number
@@ -116,6 +117,28 @@ export default class DNCSim extends Sim {
         this.critFromBuffs = 0;
         this.dhitFromBuffs = 0;
         this.state = new DancerState()
+        this.registerProcs()
+    }
+
+    getDancerComment(): { feathers: number } {
+        return {
+            feathers: this.state.getFeathers()
+        }
+    }
+
+    useSkill(skill: Skill): DamageLog {
+        if (skill.onUse) {
+            skill.onUse(this.state);
+        }
+        let log: DamageLog = super.useSkill(skill)
+        log.comment = this.getDancerComment();
+        return log
+    }
+
+    useAutoAttack(autoAttack: AutoAttack): DamageLog {
+        let log: DamageLog = super.useAutoAttack(autoAttack)
+        log.comment = this.getDancerComment();
+        return log
     }
 
     calcCritChanceFromBuffs(): number {
@@ -127,7 +150,7 @@ export default class DNCSim extends Sim {
     }
 
     printDamageLogLine(damageLog: DamageLog): void {
-        let logLine: string = `${damageLog.timestamp.toFixed(2).padStart(5, '0')}| ${damageLog.potency}p |${damageLog.name} : ${damageLog.damage} `;
+        let logLine: string = `${damageLog.timestamp.toFixed(2).padStart(5, '0')}| ${damageLog.potency.toString().padStart(4, ' ')}p | Feathers: ${damageLog.comment?.feathers} | ${damageLog.damage.toString().padStart(6, ' ')} | ${damageLog.name} `;
 
         if (damageLog.crit) {
             logLine += "C"
@@ -147,6 +170,12 @@ export default class DNCSim extends Sim {
     getNextGCD(): Skill {
         if (this.opener?.length) {
             return this.opener.shift()
+        }
+        if (this.state.getProcByName("Flourishing Fountain")) {
+            return dancerSkills.fountainFall
+        }
+        if (this.state.getProcByName("Flourishing Cascade")) {
+            return dancerSkills.reverseCascade
         }
         if (this.comboAction == dancerSkills.cascade) {
             return dancerSkills.fountain
@@ -196,5 +225,37 @@ export default class DNCSim extends Sim {
         while (this.getCurrentTime() < this.maxTime) {
             damageLog = this.doNextAction();
         }
+    }
+
+    registerProcs(): void {
+        dancerSkills.cascade.onUse = (damageLog: DamageLog) => {
+            if (Math.random() < dancerSkills.cascade.procChance) {
+                this.state.addProc(dancerSkills.cascade.proc)
+            }
+        }
+
+        dancerSkills.fountain.onUse = (damageLog: DamageLog) => {
+            if (Math.random() < dancerSkills.fountain.procChance) {
+                this.state.addProc(dancerSkills.fountain.proc)
+            }
+        }
+
+        dancerSkills.reverseCascade.onUse = (damageLog: DamageLog) => {
+            this.state.removeProc(dancerProcs["Flourishing Cascade"])
+            this.featherProc(0.5)
+        }
+
+        dancerSkills.fountainFall.onUse = (damageLog: DamageLog) => {
+            this.state.removeProc(dancerProcs["Flourishing Fountain"])
+            this.featherProc(0.5)
+        }
+    }
+
+    featherProc(chance: number): boolean {
+        if (Math.random() < chance) {
+            this.state.addFeather()
+            return true
+        }
+        return false
     }
 }

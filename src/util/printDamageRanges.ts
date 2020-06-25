@@ -35,3 +35,4 @@ const printDamageRanges = (potency: number, levelMod: LevelMod, player: Player, 
 }
 
 export { printDamageRanges, printSkillDamageRanges };
+

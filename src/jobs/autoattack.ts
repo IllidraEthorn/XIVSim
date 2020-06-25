@@ -3,5 +3,5 @@ export default interface AutoAttack {
     traitDamageMult: number
     autoAttackDelay: number
 
-    onUse? <T>(state: T): T
+    onUse?<T>(state: T): T
 }

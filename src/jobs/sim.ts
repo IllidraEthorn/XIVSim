@@ -1,8 +1,8 @@
 import { LevelMod } from "../consts/levelmod";
 import { Player } from "../player/player";
-import Skill from "./skill";
+import { calcAutoAttackDamage, calcDamage, critChance, critDamageBonus, directHitChance } from "../util/damagecalc";
 import AutoAttack from "./autoattack";
-import { calcDamage, critChance, directHitChance, critDamageBonus, calcAutoAttackDamage } from "../util/damagecalc";
+import Skill from "./skill";
 
 export interface DamageLog {
     name: string
@@ -11,7 +11,7 @@ export interface DamageLog {
     directHit: boolean
     crit: boolean
     timestamp: number
-    comment?: string
+    comment?: any
 }
 
 export default abstract class Sim {

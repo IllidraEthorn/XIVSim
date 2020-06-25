@@ -1,6 +1,6 @@
+import AutoAttack from "../autoattack";
 import JobMods from "../jobmods";
 import Skill from "../skill";
-import AutoAttack from "../autoattack";
 
 const jobMods: JobMods = {
     hp: 105,
@@ -20,6 +20,12 @@ const jobMods: JobMods = {
 
 const globalTraitMult: number = 1.2
 
+//Not sure how to type this
+const procs = {
+    "Flourishing Cascade": { name: "Flourishing Cascade", duration: 20 },
+    "Flourishing Fountain": { name: "Flourishing Fountain", duration: 20 }
+}
+
 const autoAttack: AutoAttack = {
     potency: 110,
     traitDamageMult: 1.0,
@@ -33,7 +39,9 @@ const cascade: Skill = {
     potency: 250,
     traitDamageMult: globalTraitMult,
     isGCD: true,
-    comboInteraction: true
+    comboInteraction: true,
+    proc: procs["Flourishing Cascade"],
+    procChance: 0.5
 }
 
 const fountain: Skill = {
@@ -45,15 +53,38 @@ const fountain: Skill = {
     comboActions: [cascade],
     traitDamageMult: globalTraitMult,
     isGCD: true,
-    comboInteraction: true
+    comboInteraction: true,
+    proc: procs["Flourishing Fountain"],
+    procChance: 0.5
+}
+
+const reverseCascade: Skill = {
+    name: "Reverse Cascade",
+    baseCastTime: 0,
+    baseRecastTime: 2.5,
+    potency: 300,
+    traitDamageMult: globalTraitMult,
+    isGCD: true
+}
+
+const fountainFall: Skill = {
+    name: "Fountainfall",
+    baseCastTime: 0,
+    baseRecastTime: 2.5,
+    potency: 350,
+    traitDamageMult: globalTraitMult,
+    isGCD: true
 }
 
 const skills = {
-    autoAttack,
     cascade,
-    fountain
+    reverseCascade,
+    fountain,
+    fountainFall
 }
 
-export { jobMods as dancerJobMods }
-export { skills as dancerSkills }
-export { autoAttack as dancerAutoAttack }
+export { jobMods as dancerJobMods };
+export { skills as dancerSkills };
+export { autoAttack as dancerAutoAttack };
+export { procs as dancerProcs };
+

@@ -1,3 +1,5 @@
+import Proc from "./proc";
+
 export default interface Skill {
     name: string
     baseCastTime: number
@@ -14,6 +16,11 @@ export default interface Skill {
     //Set to true if this skill interacts with your combo (Is a combo action or can break your combo)
     //True for Cascade, but False for Reverse Cascade and Bloodspiller
     comboInteraction?: boolean
+
+    //Is there a proc that this skill can trigger on use?
+    proc?: Proc
+    //Chance of the proc occurring 
+    procChance?: number
 
     onUse?(state: any): any
 }
