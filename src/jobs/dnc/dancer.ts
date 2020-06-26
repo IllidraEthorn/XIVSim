@@ -1,6 +1,7 @@
 import AutoAttack from "../autoattack";
 import JobMods from "../jobmods";
 import Skill from "../skill";
+import Proc from "../proc";
 
 const jobMods: JobMods = {
     hp: 105,
@@ -22,9 +23,14 @@ const globalTraitMult: number = 1.2
 const globalAnimLock: number = 0.75
 
 //Not sure how to type this
+
+
+const flourishingCascade: Proc = { name: "Flourishing Cascade", duration: 20 }
+const flourishingFountain: Proc = { name: "Flourishing Fountain", duration: 20 }
+
 const procs = {
-    "Flourishing Cascade": { name: "Flourishing Cascade", duration: 20 },
-    "Flourishing Fountain": { name: "Flourishing Fountain", duration: 20 }
+    flourishingCascade,
+    flourishingFountain
 }
 
 const autoAttack: AutoAttack = {
@@ -41,7 +47,7 @@ const cascade: Skill = {
     traitDamageMult: globalTraitMult,
     isGCD: true,
     comboInteraction: true,
-    proc: procs["Flourishing Cascade"],
+    proc: procs.flourishingCascade,
     procChance: 0.5,
     animationLock: globalAnimLock
 }
@@ -56,7 +62,7 @@ const fountain: Skill = {
     traitDamageMult: globalTraitMult,
     isGCD: true,
     comboInteraction: true,
-    proc: procs["Flourishing Fountain"],
+    proc: procs.flourishingFountain,
     procChance: 0.5,
     animationLock: globalAnimLock
 }
