@@ -19,6 +19,7 @@ const jobMods: JobMods = {
 }
 
 const globalTraitMult: number = 1.2
+const globalAnimLock: number = 0.75
 
 //Not sure how to type this
 const procs = {
@@ -41,7 +42,8 @@ const cascade: Skill = {
     isGCD: true,
     comboInteraction: true,
     proc: procs["Flourishing Cascade"],
-    procChance: 0.5
+    procChance: 0.5,
+    animationLock: globalAnimLock
 }
 
 const fountain: Skill = {
@@ -55,7 +57,8 @@ const fountain: Skill = {
     isGCD: true,
     comboInteraction: true,
     proc: procs["Flourishing Fountain"],
-    procChance: 0.5
+    procChance: 0.5,
+    animationLock: globalAnimLock
 }
 
 const reverseCascade: Skill = {
@@ -64,7 +67,8 @@ const reverseCascade: Skill = {
     baseRecastTime: 2.5,
     potency: 300,
     traitDamageMult: globalTraitMult,
-    isGCD: true
+    isGCD: true,
+    animationLock: globalAnimLock
 }
 
 const fountainFall: Skill = {
@@ -73,14 +77,25 @@ const fountainFall: Skill = {
     baseRecastTime: 2.5,
     potency: 350,
     traitDamageMult: globalTraitMult,
-    isGCD: true
+    isGCD: true,
+    animationLock: globalAnimLock
+}
+
+const flourish: Skill = {
+    name: "Flourish",
+    baseCastTime: 0,
+    baseRecastTime: 60,
+    traitDamageMult: 0,
+    isGCD: false,
+    animationLock: globalAnimLock
 }
 
 const skills = {
     cascade,
     reverseCascade,
     fountain,
-    fountainFall
+    fountainFall,
+    flourish
 }
 
 export { jobMods as dancerJobMods };

@@ -21,6 +21,7 @@ export default class DNCSim extends Sim {
         this.dhitFromBuffs = 0;
         this.state = new DancerState()
         this.registerProcs()
+        this.registerCooldowns()
     }
 
     getDancerComment(): { feathers: number } {
@@ -35,6 +36,26 @@ export default class DNCSim extends Sim {
         }
         let log: DamageLog = super.useSkill(skill)
         log.comment = this.getDancerComment();
+        return log
+    }
+
+    useOGCD(skill: Skill): DamageLog {
+        if (skill.onUse) {
+            skill.onUse(this.state);
+        }
+        let log: any = super.useOGCD(skill)
+        log.comment = this.getDancerComment();
+        if (!log.name) {
+            return {
+                name: skill.name,
+                damage: 0,
+                potency: 0,
+                directHit: false,
+                crit: false,
+                timestamp: log.timestamp,
+                comment: log.comment
+            }
+        }
         return log
     }
 
@@ -86,13 +107,44 @@ export default class DNCSim extends Sim {
         return dancerSkills.cascade
     }
 
-    //Figure out if we should do a gcd, ogcd, etc
+    //Figure out if we should do a gcd, ogcd, auto attack, wait etc
     doNextAction(): DamageLog {
+        if (this.autoAttackTimer > this.animLock) {
+            this.jumpAnimationLock()
+        }
+        let nextOGCD: Skill = this.getNextOGCD()
+        if (nextOGCD) {
+            return this.doNextOGCD()
+        }
         if (this.autoAttackTimer > this.gcdTimer) {
             return this.doNextGCD()
-        } else {
+        }
+        else {
             return this.doAutoAttack()
         }
+    }
+
+    getNextOGCD(): Skill {
+        if (this.animLock > 0) {
+            return null
+        }
+        if (!this.getCooldown(dancerSkills.flourish.name) && dancerSkills.flourish.animationLock < this.gcdTimer && this.shouldUseFlourish()) {
+            return dancerSkills.flourish
+        }
+        return null
+    }
+
+    doNextOGCD(): DamageLog {
+        const nextOGCD = this.getNextOGCD()
+
+        let damageLog: DamageLog;
+
+        damageLog = this.useOGCD(nextOGCD)
+        if (damageLog.damage > 0) {
+            this.dealDamage(damageLog.damage)
+        }
+
+        return damageLog;
     }
 
     //Perform the next gcd
@@ -127,6 +179,8 @@ export default class DNCSim extends Sim {
         let damageLog: DamageLog;
         while (this.getCurrentTime() < this.maxTime) {
             damageLog = this.doNextAction();
+            this.log.push(damageLog)
+            //this.printDamageLogLine(damageLog)
         }
     }
 
@@ -154,11 +208,26 @@ export default class DNCSim extends Sim {
         }
     }
 
+    registerCooldowns(): void {
+        dancerSkills.flourish.onUse = (damageLog: DamageLog) => {
+            this.addCooldown({ name: dancerSkills.flourish.name, duration: dancerSkills.flourish.baseRecastTime })
+            this.state.addProc(dancerSkills.cascade.proc)
+            this.state.addProc(dancerSkills.fountain.proc)
+        }
+    }
+
     featherProc(chance: number): boolean {
         if (Math.random() < chance) {
             this.state.addFeather()
             return true
         }
         return false
+    }
+
+    shouldUseFlourish(): boolean {
+        if (this.state.getProcByName(dancerProcs["Flourishing Cascade"].name) || this.state.getProcByName(dancerProcs["Flourishing Fountain"].name)) {
+            return false
+        }
+        return true
     }
 }

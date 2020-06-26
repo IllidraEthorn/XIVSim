@@ -4,7 +4,7 @@ export default interface Skill {
     name: string
     baseCastTime: number
     baseRecastTime: number
-    potency: number
+    potency?: number
     traitDamageMult: number
 
     //Does this skill trigger the gcd?
@@ -21,6 +21,9 @@ export default interface Skill {
     proc?: Proc
     //Chance of the proc occurring 
     procChance?: number
+
+    //Does this skill have an animation lock? (Can't do an action for x duration) 0.75?? for most things
+    animationLock?: number
 
     onUse?(state: any): any
 }

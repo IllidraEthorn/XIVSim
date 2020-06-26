@@ -1,0 +1,1 @@
+export default interface CommentLog { timestamp: number, comment: string }

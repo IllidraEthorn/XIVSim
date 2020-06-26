@@ -2,6 +2,8 @@ import { LevelMod } from "../consts/levelmod";
 import { Player } from "../player/player";
 import { calcAutoAttackDamage, calcDamage, critChance, critDamageBonus, directHitChance } from "../util/damagecalc";
 import AutoAttack from "./autoattack";
+import CommentLog from "./commentlog";
+import Cooldown from "./cooldown";
 import DamageLog from "./damagelog";
 import Skill from "./skill";
 
@@ -17,6 +19,8 @@ export default abstract class Sim {
     comboTimer: number;
     comboAction: Skill;
     log: Array<DamageLog>;
+    cooldowns: Array<Cooldown>;
+    animLock: number;
 
     constructor(player: Player, levelMod: LevelMod, maxTime: number, printLog?: boolean) {
         this.player = player
@@ -29,6 +33,8 @@ export default abstract class Sim {
         this.comboTimer = 0
         this.autoAttackTimer = 0
         this.log = []
+        this.cooldowns = []
+        this.animLock = 0
     }
 
     dealDamage(damage: number): void {
@@ -43,12 +49,19 @@ export default abstract class Sim {
         this.jumpTimeBy(this.autoAttackTimer);
     }
 
+    //Ends the animation lock
+    jumpAnimationLock(): void {
+        this.jumpTimeBy(this.animLock)
+    }
+
     //Jumps forward in time, updating the auto attack timer and gcd timer
     jumpTimeBy(time: number): void {
         this.currentTime += time
         this.gcdTimer = Math.max(this.gcdTimer - time, 0)
         this.autoAttackTimer = Math.max(this.autoAttackTimer - time, 0)
         this.comboTimer = Math.max(this.comboTimer - time, 0)
+        this.animLock = Math.max(this.animLock - time, 0)
+        this.cooldownsJumpBy(time)
     }
 
     summary(): any {
@@ -100,14 +113,29 @@ export default abstract class Sim {
             timestamp: timeToLog
         }
 
-        this.log.push(damageLog);
-
         if (skill.comboInteraction) {
             this.comboAction = skill;
             this.comboTimer = 10;
         }
 
+        if (skill.animationLock) {
+            this.animLock = skill.animationLock
+        }
+
         return damageLog
+    }
+
+    useOGCD(skill: Skill): DamageLog | CommentLog {
+
+        if (skill.potency) {
+            return this.useSkill(skill)
+        }
+
+        if (skill.animationLock) {
+            this.animLock = skill.animationLock
+        }
+
+        return { timestamp: this.getCurrentTime(), comment: `Used ${skill.name}` }
     }
 
     useAutoAttack(autoAttack: AutoAttack): DamageLog {
@@ -140,9 +168,41 @@ export default abstract class Sim {
             timestamp: timeToLog
         }
 
-        this.log.push(damageLog);
-
         return damageLog
+    }
+
+    getCooldown(name: string): Cooldown {
+        return this.cooldowns.find((cooldown: Cooldown) => {
+            if (cooldown.name === name) {
+                return true
+            }
+            return false
+        })
+    }
+
+    removeCooldown(cooldownToRemove: Cooldown): void {
+        this.cooldowns = this.cooldowns.filter((cooldown) => cooldown.name !== cooldownToRemove.name)
+    }
+
+    addCooldown(cooldown: Cooldown): void {
+        //If the cooldown already exists
+        if (this.getCooldown(cooldown.name)) {
+            this.removeCooldown(cooldown)
+        }
+
+        this.cooldowns.push(cooldown)
+
+        this.cooldowns.sort((p1, p2) => p1.duration - p2.duration)
+    }
+
+    //Simulates time for all cooldowns, removing any cooldowns that have run out
+    cooldownsJumpBy(time: number): void {
+
+        let afterTime = this.cooldowns.map((cooldown) => {
+            cooldown.duration = cooldown.duration - time
+            return cooldown
+        });
+        this.cooldowns = afterTime.filter((cooldown) => cooldown.duration > 0)
     }
 
     abstract calcCritChanceFromBuffs(): number;
