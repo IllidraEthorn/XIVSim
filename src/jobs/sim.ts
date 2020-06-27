@@ -2,6 +2,7 @@ import { LevelMod } from "../consts/levelmod";
 import { Player } from "../player/player";
 import { calcAutoAttackDamage, calcDamage, critChance, critDamageBonus, directHitChance } from "../util/damagecalc";
 import AutoAttack from "./autoattack";
+import Buff from "./buff";
 import CommentLog from "./commentlog";
 import Cooldown from "./cooldown";
 import DamageLog from "./damagelog";
@@ -21,6 +22,7 @@ export default abstract class Sim {
     log: Array<DamageLog>;
     cooldowns: Array<Cooldown>;
     animLock: number;
+    buffs: Array<Buff>
 
     constructor(player: Player, levelMod: LevelMod, maxTime: number, printLog?: boolean) {
         this.player = player
@@ -35,6 +37,7 @@ export default abstract class Sim {
         this.log = []
         this.cooldowns = []
         this.animLock = 0
+        this.buffs = []
     }
 
     dealDamage(damage: number): void {
@@ -62,6 +65,7 @@ export default abstract class Sim {
         this.comboTimer = Math.max(this.comboTimer - time, 0)
         this.animLock = Math.max(this.animLock - time, 0)
         this.cooldownsJumpBy(time)
+        this.buffsJumpBy(time)
     }
 
     summary(): any {
@@ -90,7 +94,7 @@ export default abstract class Sim {
         const critC: number = critChance(this.levelMod, this.player.stats.crit) / 100 + this.calcCritChanceFromBuffs();
         const dhitC: number = directHitChance(this.levelMod, this.player.stats.dhit) / 100 + this.calcDHitChanceFromBuffs();
 
-        let damage: number = baseDamage
+        let damage: number = Math.floor(baseDamage * this.calcDamageMultFromBuffs())
         let chit = false
         let dhit = false;
 
@@ -145,7 +149,9 @@ export default abstract class Sim {
         const critC: number = critChance(this.levelMod, this.player.stats.crit) / 100 + this.calcCritChanceFromBuffs();
         const dhitC: number = directHitChance(this.levelMod, this.player.stats.dhit) / 100 + this.calcDHitChanceFromBuffs();
 
-        let damage: number = baseDamage
+        let damage: number = Math.floor(baseDamage * this.calcDamageMultFromBuffs())
+
+        console.log("Mult", this.calcDamageMultFromBuffs())
         let chit = false
         let dhit = false;
 
@@ -205,13 +211,59 @@ export default abstract class Sim {
         this.cooldowns = afterTime.filter((cooldown) => cooldown.duration > 0.001)
     }
 
+    getBuff(name: string): Buff {
+        return this.buffs.find((buff: Buff) => {
+            if (buff.name === name) {
+                return true
+            }
+            return false
+        })
+    }
+
+    getBuffs(): Array<Buff> {
+        return this.buffs
+    }
+
+    removeBuff(buffToRemove: Buff): void {
+        this.buffs = this.buffs.filter((buff) => buff.name !== buffToRemove.name)
+    }
+
+    addBuff(buff: Buff): void {
+        //If the buff already exists
+        if (this.getBuff(buff.name)) {
+            this.removeBuff(buff)
+        }
+
+        this.buffs.push(buff)
+
+        this.buffs.sort((p1, p2) => p1.duration - p2.duration)
+    }
+
+    //Simulates time for all buffs, removing any buffs that have run out
+    buffsJumpBy(time: number): void {
+
+        let afterTime = this.buffs.map((buff) => {
+            buff.duration = buff.duration - time
+            return buff
+        });
+        this.buffs = afterTime.filter((buff) => buff.duration > 0.001)
+    }
+
     triggerGCD(time: number): void {
         this.gcdTimer = time
     }
 
-    abstract calcCritChanceFromBuffs(): number;
+    calcDamageMultFromBuffs(): number {
+        return 1
+    }
 
-    abstract calcDHitChanceFromBuffs(): number;
+    calcCritChanceFromBuffs(): number {
+        return 0
+    }
+
+    calcDHitChanceFromBuffs(): number {
+        return 0
+    }
 
     abstract printDamageLogLine(damageLog: DamageLog): void;
 

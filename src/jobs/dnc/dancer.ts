@@ -2,6 +2,7 @@ import AutoAttack from "../autoattack";
 import JobMods from "../jobmods";
 import Proc from "../proc";
 import Skill from "../skill";
+import Buff from "../buff";
 
 const jobMods: JobMods = {
     hp: 105,
@@ -23,8 +24,6 @@ const globalTraitMult: number = 1.2
 const globalAnimLock: number = 0.75
 
 //Not sure how to type this
-
-
 const flourishingCascade: Proc = { name: "Flourishing Cascade", duration: 20 }
 const flourishingFountain: Proc = { name: "Flourishing Fountain", duration: 20 }
 
@@ -35,6 +34,14 @@ const procs = {
     flourishingFountain,
 
     flourishingFanDance
+}
+
+const standardFinishBuff: Buff = { name: "Standard Finish", duration: 60 }
+const technicalFinishBuff: Buff = { name: "Technical Finish", duration: 20 }
+
+const buffs = {
+    standardFinishBuff,
+    technicalFinishBuff
 }
 
 const autoAttack: AutoAttack = {
@@ -193,4 +200,4 @@ export { jobMods as dancerJobMods };
 export { skills as dancerSkills };
 export { autoAttack as dancerAutoAttack };
 export { procs as dancerProcs };
-
+export { buffs as dancerBuffs };

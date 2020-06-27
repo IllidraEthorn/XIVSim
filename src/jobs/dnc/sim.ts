@@ -4,49 +4,48 @@ import AutoAttack from "../autoattack";
 import DamageLog from "../damagelog";
 import Sim from "../sim";
 import Skill from "../skill";
-import { dancerAutoAttack, dancerProcs, dancerSkills } from "./dancer";
+import { dancerAutoAttack, dancerProcs, dancerSkills, dancerBuffs } from "./dancer";
 import DancerState from "./dancerstate";
 
 export default class DNCSim extends Sim {
 
-    critFromBuffs: number
-    dhitFromBuffs: number
     opener: Array<Skill>
     state: DancerState
 
     constructor(player: Player, levelMod: LevelMod, maxTime: number, opener?: Array<Skill>, printLog?: boolean) {
         super(player, levelMod, maxTime, printLog);
         this.opener = opener
-        this.critFromBuffs = 0;
-        this.dhitFromBuffs = 0;
         this.state = new DancerState()
         this.registerProcs()
         this.registerCooldowns()
     }
 
-    getDancerComment(): { feathers: number, procs: string } {
+    getDancerComment(): { feathers: number, procs: string, buffs: string } {
         return {
             feathers: this.state.getFeathers(),
             procs: this.state.getProcs().reduce((acc: string, proc) => {
                 return acc + `${proc.name}(${proc.duration.toFixed(2)}) `
+            }, ""),
+            buffs: this.getBuffs().reduce((acc: string, buff) => {
+                return acc + `${buff.name}(${buff.duration.toFixed(2)}) `
             }, "")
         }
     }
 
     useSkill(skill: Skill): DamageLog {
+        let log: DamageLog = super.useSkill(skill)
         if (skill.onUse) {
             skill.onUse(this.state);
         }
-        let log: DamageLog = super.useSkill(skill)
         log.comment = this.getDancerComment();
         return log
     }
 
     useOGCD(skill: Skill): DamageLog {
+        let log: any = super.useOGCD(skill)
         if (skill.onUse) {
             skill.onUse(this.state);
         }
-        let log: any = super.useOGCD(skill)
         log.comment = this.getDancerComment();
         if (!log.name) {
             return {
@@ -68,16 +67,40 @@ export default class DNCSim extends Sim {
         return log
     }
 
+    calcDamageMultFromBuffs(): number {
+        let mult: number = 1
+        this.getBuffs().forEach((buff) => {
+            switch (buff.name) {
+                case dancerBuffs.standardFinishBuff.name:
+                    mult = mult * 1.05
+                    break
+                case dancerBuffs.technicalFinishBuff.name:
+                    mult = mult * 1.05
+                    break
+                default:
+                    break
+            }
+        })
+        return mult
+    }
+
     calcCritChanceFromBuffs(): number {
-        return this.critFromBuffs
+        let mult: number = 0
+        this.getBuffs().forEach((buff) => {
+            switch (buff.name) {
+                default:
+                    break
+            }
+        })
+        return mult
     }
 
     calcDHitChanceFromBuffs(): number {
-        return this.dhitFromBuffs
+        return 0
     }
 
     printDamageLogLine(damageLog: DamageLog): void {
-        let logLine: string = `${damageLog.timestamp.toFixed(2).padStart(6, ' ')}| ${damageLog.potency.toString().padStart(4, ' ')}p | Feathers: ${damageLog.comment?.feathers} | ${damageLog.damage.toString().padStart(6, ' ')} | ${damageLog.name} | Procs: ${damageLog.comment?.procs}`;
+        let logLine: string = `${damageLog.timestamp.toFixed(2).padStart(6, ' ')}| ${damageLog.potency.toString().padStart(4, ' ')}p | Feathers: ${damageLog.comment?.feathers} | ${damageLog.damage.toString().padStart(6, ' ')} | ${damageLog.name}`;
 
         if (damageLog.crit) {
             logLine += "C"
@@ -85,6 +108,8 @@ export default class DNCSim extends Sim {
         if (damageLog.directHit) {
             logLine += "D"
         }
+
+        logLine = logLine + ` | Buffs: ${damageLog.comment?.buffs}`
 
         console.log(logLine);
     }
@@ -281,11 +306,13 @@ export default class DNCSim extends Sim {
         dancerSkills.standardFinish.onUse = (damageLog: DamageLog) => {
             this.triggerGCD(1.5)
             this.state.setInStandard(false)
+            this.addBuff({ name: dancerBuffs.standardFinishBuff.name, duration: dancerBuffs.standardFinishBuff.duration })
         }
 
         dancerSkills.technicalFinish.onUse = (damageLog: DamageLog) => {
             this.triggerGCD(1.5)
             this.state.setInTechnical(false)
+            this.addBuff({ name: dancerBuffs.technicalFinishBuff.name, duration: dancerBuffs.technicalFinishBuff.duration })
         }
     }
 
