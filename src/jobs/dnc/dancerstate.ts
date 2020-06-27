@@ -10,7 +10,8 @@ export default class DancerState {
     private procs: Array<Proc>
 
     private stepsRemaining: number
-    private inDance: boolean
+    private inStandard: boolean
+    private inTechnical: boolean
 
     constructor() {
         this.esprit = 0
@@ -22,7 +23,8 @@ export default class DancerState {
         this.procs = []
 
         this.stepsRemaining = 0
-        this.inDance = false
+        this.inStandard = false
+        this.inTechnical = false
     }
 
     getEsprit(): number {
@@ -113,16 +115,35 @@ export default class DancerState {
 
     setRemainingSteps(number: number): void {
         this.stepsRemaining = number;
-        if (number > 0) {
-            this.setInDance(true)
+    }
+
+    setInStandard(inStandard: boolean): void {
+        if (inStandard) {
+            this.inStandard = true
+            this.setRemainingSteps(2)
+        } else {
+            this.inStandard = false
         }
     }
 
-    setInDance(inDance: boolean): void {
-        this.inDance = inDance
+    setInTechnical(inTechnical: boolean): void {
+        if (inTechnical) {
+            this.inTechnical = true
+            this.setRemainingSteps(4)
+        } else {
+            this.inTechnical = false
+        }
+    }
+
+    getInStandard(): boolean {
+        return this.inStandard
+    }
+
+    getInTechnical(): boolean {
+        return this.inTechnical
     }
 
     getInDance(): boolean {
-        return this.inDance
+        return (this.getInStandard() || this.getInTechnical())
     }
 }

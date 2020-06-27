@@ -1,7 +1,7 @@
 import AutoAttack from "../autoattack";
 import JobMods from "../jobmods";
-import Skill from "../skill";
 import Proc from "../proc";
+import Skill from "../skill";
 
 const jobMods: JobMods = {
     hp: 105,
@@ -111,6 +111,16 @@ const standardStep: Skill = {
     animationLock: 1.5
 }
 
+const technicalStep: Skill = {
+    name: "Technical Step",
+    baseCastTime: 0,
+    baseRecastTime: 1.5,
+    cooldown: 120,
+    traitDamageMult: 0,
+    isGCD: true,
+    animationLock: 1.5
+}
+
 const step: Skill = {
     name: "Step",
     baseCastTime: 0,
@@ -130,6 +140,16 @@ const standardFinish: Skill = {
     animationLock: globalAnimLock
 }
 
+const technicalFinish: Skill = {
+    name: "Technical Finish",
+    baseCastTime: 0,
+    baseRecastTime: 1.5,
+    potency: 1500,
+    traitDamageMult: globalTraitMult,
+    isGCD: true,
+    animationLock: globalAnimLock
+}
+
 const fanDance: Skill = {
     name: "Fan Dance",
     baseCastTime: 0,
@@ -143,6 +163,17 @@ const fanDance: Skill = {
     procChance: 0.5
 }
 
+const fanDance3: Skill = {
+    name: "Fan Dance III",
+    baseCastTime: 0,
+    baseRecastTime: 1.00,
+    potency: 200,
+    cooldown: 1.00,
+    traitDamageMult: globalTraitMult,
+    isGCD: false,
+    animationLock: globalAnimLock
+}
+
 const skills = {
     cascade,
     reverseCascade,
@@ -150,9 +181,12 @@ const skills = {
     fountainFall,
     flourish,
     standardStep,
+    technicalStep,
     step,
     standardFinish,
-    fanDance
+    technicalFinish,
+    fanDance,
+    fanDance3
 }
 
 export { jobMods as dancerJobMods };
