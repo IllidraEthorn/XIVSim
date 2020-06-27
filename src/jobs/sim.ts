@@ -80,7 +80,7 @@ export default abstract class Sim {
     useSkill(skill: Skill): DamageLog {
         const timeToLog = this.getCurrentTime();
 
-        let potency = skill.potency;
+        let potency = skill.potency ? skill.potency : 0;
         if (skill.comboPotency && this.comboTimer > 0 && skill.comboActions?.includes(this.comboAction)) {
             potency = skill.comboPotency
             this.comboTimer = 0
@@ -202,7 +202,11 @@ export default abstract class Sim {
             cooldown.duration = cooldown.duration - time
             return cooldown
         });
-        this.cooldowns = afterTime.filter((cooldown) => cooldown.duration > 0)
+        this.cooldowns = afterTime.filter((cooldown) => cooldown.duration > 0.001)
+    }
+
+    triggerGCD(time: number): void {
+        this.gcdTimer = time
     }
 
     abstract calcCritChanceFromBuffs(): number;

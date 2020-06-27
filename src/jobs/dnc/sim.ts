@@ -6,7 +6,6 @@ import Sim from "../sim";
 import Skill from "../skill";
 import { dancerAutoAttack, dancerProcs, dancerSkills } from "./dancer";
 import DancerState from "./dancerstate";
-import Proc from "../proc";
 
 export default class DNCSim extends Sim {
 
@@ -28,7 +27,9 @@ export default class DNCSim extends Sim {
     getDancerComment(): { feathers: number, procs: string } {
         return {
             feathers: this.state.getFeathers(),
-            procs: JSON.stringify(this.state.getProcs())
+            procs: this.state.getProcs().reduce((acc: string, proc) => {
+                return acc + `${proc.name}(${proc.duration.toFixed(2)}) `
+            }, "")
         }
     }
 
@@ -76,7 +77,7 @@ export default class DNCSim extends Sim {
     }
 
     printDamageLogLine(damageLog: DamageLog): void {
-        let logLine: string = `${damageLog.timestamp.toFixed(2).padStart(5, '0')}| ${damageLog.potency.toString().padStart(4, ' ')}p | Feathers: ${damageLog.comment?.feathers} | ${damageLog.damage.toString().padStart(6, ' ')} | ${damageLog.name} | Procs: ${damageLog.comment?.procs}`;
+        let logLine: string = `${damageLog.timestamp.toFixed(2).padStart(6, ' ')}| ${damageLog.potency.toString().padStart(4, ' ')}p | Feathers: ${damageLog.comment?.feathers} | ${damageLog.damage.toString().padStart(6, ' ')} | ${damageLog.name} | Procs: ${damageLog.comment?.procs}`;
 
         if (damageLog.crit) {
             logLine += "C"
@@ -96,6 +97,17 @@ export default class DNCSim extends Sim {
     getNextGCD(): Skill {
         if (this.opener?.length) {
             return this.opener.shift()
+        }
+        if (!this.getCooldown(dancerSkills.standardStep.name)) {
+            return dancerSkills.standardStep
+        }
+        if (this.state.getInDance()) {
+            if (this.state.getStepsRemaining() > 0) {
+                return dancerSkills.step
+            }
+            if (this.state.getStepsRemaining() === 0) {
+                return dancerSkills.standardFinish
+            }
         }
         if (this.state.getProcByName(dancerProcs.flourishingFountain.name)) {
             return dancerSkills.fountainFall
@@ -130,8 +142,11 @@ export default class DNCSim extends Sim {
         if (this.animLock > 0) {
             return null
         }
-        if (!this.getCooldown(dancerSkills.flourish.name) && dancerSkills.flourish.animationLock < this.gcdTimer && this.shouldUseFlourish()) {
+        if (!this.getCooldown(dancerSkills.flourish.name) && dancerSkills.flourish.animationLock <= this.gcdTimer && this.shouldUseFlourish()) {
             return dancerSkills.flourish
+        }
+        if (!this.getCooldown(dancerSkills.fanDance.name) && dancerSkills.fanDance.animationLock <= this.gcdTimer && this.shouldUseFanDance()) {
+            return dancerSkills.fanDance
         }
         return null
     }
@@ -141,7 +156,7 @@ export default class DNCSim extends Sim {
 
         let damageLog: DamageLog;
 
-        damageLog = this.useOGCD(nextOGCD)
+        damageLog = this.useSkill(nextOGCD)
         if (damageLog.damage > 0) {
             this.dealDamage(damageLog.damage)
         }
@@ -199,6 +214,14 @@ export default class DNCSim extends Sim {
             }
         }
 
+        dancerSkills.fanDance.onUse = (damageLog: DamageLog) => {
+            if (Math.random() < dancerSkills.fanDance.procChance) {
+                this.state.addProc(dancerSkills.fanDance.proc)
+            }
+            this.addCooldown({ name: dancerSkills.fanDance.name, duration: dancerSkills.fanDance.cooldown })
+            this.state.removeFeather()
+        }
+
         dancerSkills.reverseCascade.onUse = (damageLog: DamageLog) => {
             this.state.removeProc(dancerProcs.flourishingCascade)
             this.featherProc(0.5)
@@ -208,13 +231,32 @@ export default class DNCSim extends Sim {
             this.state.removeProc(dancerProcs.flourishingFountain)
             this.featherProc(0.5)
         }
+
+
     }
 
     registerCooldowns(): void {
         dancerSkills.flourish.onUse = (damageLog: DamageLog) => {
-            this.addCooldown({ name: dancerSkills.flourish.name, duration: dancerSkills.flourish.baseRecastTime })
+            this.addCooldown({ name: dancerSkills.flourish.name, duration: dancerSkills.flourish.cooldown })
             this.state.addProc(dancerSkills.cascade.proc)
             this.state.addProc(dancerSkills.fountain.proc)
+        }
+
+        dancerSkills.standardStep.onUse = (damageLog: DamageLog) => {
+            this.addCooldown({ name: dancerSkills.standardStep.name, duration: dancerSkills.standardStep.cooldown })
+            this.triggerGCD(1.5)
+            this.state.setRemainingSteps(2)
+            this.state.setInDance(true)
+        }
+
+        dancerSkills.step.onUse = (damageLog: DamageLog) => {
+            this.triggerGCD(1.0)
+            this.state.removeStep()
+        }
+
+        dancerSkills.standardFinish.onUse = (damageLog: DamageLog) => {
+            this.triggerGCD(1.5)
+            this.state.setInDance(false)
         }
     }
 
@@ -228,6 +270,13 @@ export default class DNCSim extends Sim {
 
     shouldUseFlourish(): boolean {
         if (this.state.getProcByName(dancerProcs.flourishingCascade.name) || this.state.getProcByName(dancerProcs.flourishingFountain.name)) {
+            return false
+        }
+        return true
+    }
+
+    shouldUseFanDance(): boolean {
+        if (this.state.getProcByName(dancerProcs.flourishingFanDance.name) || (this.state.getFeathers() < 4)) {
             return false
         }
         return true

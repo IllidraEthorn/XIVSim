@@ -9,6 +9,9 @@ export default class DancerState {
 
     private procs: Array<Proc>
 
+    private stepsRemaining: number
+    private inDance: boolean
+
     constructor() {
         this.esprit = 0
         this.feathers = 0
@@ -17,6 +20,9 @@ export default class DancerState {
         this.maxFeathers = 4
 
         this.procs = []
+
+        this.stepsRemaining = 0
+        this.inDance = false
     }
 
     getEsprit(): number {
@@ -95,5 +101,28 @@ export default class DancerState {
             return proc
         });
         this.procs = afterTime.filter((proc) => proc.duration > 0)
+    }
+
+    getStepsRemaining(): number {
+        return this.stepsRemaining;
+    }
+
+    removeStep(number: number = 1): void {
+        this.stepsRemaining = Math.max(this.stepsRemaining - number, 0);
+    }
+
+    setRemainingSteps(number: number): void {
+        this.stepsRemaining = number;
+        if (number > 0) {
+            this.setInDance(true)
+        }
+    }
+
+    setInDance(inDance: boolean): void {
+        this.inDance = inDance
+    }
+
+    getInDance(): boolean {
+        return this.inDance
     }
 }

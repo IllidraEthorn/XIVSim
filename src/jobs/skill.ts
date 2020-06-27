@@ -6,6 +6,7 @@ export default interface Skill {
     baseRecastTime: number
     potency?: number
     traitDamageMult: number
+    cooldown?: number
 
     //Does this skill trigger the gcd?
     isGCD: boolean

@@ -28,9 +28,13 @@ const globalAnimLock: number = 0.75
 const flourishingCascade: Proc = { name: "Flourishing Cascade", duration: 20 }
 const flourishingFountain: Proc = { name: "Flourishing Fountain", duration: 20 }
 
+const flourishingFanDance: Proc = { name: "Flourishing Fan Dance", duration: 20 }
+
 const procs = {
     flourishingCascade,
-    flourishingFountain
+    flourishingFountain,
+
+    flourishingFanDance
 }
 
 const autoAttack: AutoAttack = {
@@ -91,9 +95,52 @@ const flourish: Skill = {
     name: "Flourish",
     baseCastTime: 0,
     baseRecastTime: 60,
+    cooldown: 60,
     traitDamageMult: 0,
     isGCD: false,
     animationLock: globalAnimLock
+}
+
+const standardStep: Skill = {
+    name: "Standard Step",
+    baseCastTime: 0,
+    baseRecastTime: 1.5,
+    cooldown: 30,
+    traitDamageMult: 0,
+    isGCD: true,
+    animationLock: 1.5
+}
+
+const step: Skill = {
+    name: "Step",
+    baseCastTime: 0,
+    baseRecastTime: 1,
+    traitDamageMult: 0,
+    isGCD: true,
+    animationLock: 1
+}
+
+const standardFinish: Skill = {
+    name: "Standard Finish",
+    baseCastTime: 0,
+    baseRecastTime: 1.5,
+    potency: 1000,
+    traitDamageMult: globalTraitMult,
+    isGCD: true,
+    animationLock: globalAnimLock
+}
+
+const fanDance: Skill = {
+    name: "Fan Dance",
+    baseCastTime: 0,
+    baseRecastTime: 1.00,
+    potency: 150,
+    cooldown: 1.00,
+    traitDamageMult: globalTraitMult,
+    isGCD: false,
+    animationLock: globalAnimLock,
+    proc: procs.flourishingFanDance,
+    procChance: 0.5
 }
 
 const skills = {
@@ -101,7 +148,11 @@ const skills = {
     reverseCascade,
     fountain,
     fountainFall,
-    flourish
+    flourish,
+    standardStep,
+    step,
+    standardFinish,
+    fanDance
 }
 
 export { jobMods as dancerJobMods };
