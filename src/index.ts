@@ -66,7 +66,16 @@ const opener: Array<Skill> = [
     dancerSkills.flourish
 ]
 
-let sim: DNCSim = new DNCSim(dancerBIS, levelMod80, 300, opener);
+let sim: DNCSim = new DNCSim(dancerBIS, levelMod80, 150, [
+    dancerSkills.prePullStandard, 
+    dancerSkills.technicalStep,
+    dancerSkills.step,
+    dancerSkills.step,
+    dancerSkills.step,
+    dancerSkills.step,
+    dancerSkills.technicalFinish,
+    dancerSkills.flourish
+]);
 
 sim.run();
 sim.log.forEach((damageLog) => { sim.printDamageLogLine(damageLog) });

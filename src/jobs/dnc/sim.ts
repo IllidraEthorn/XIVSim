@@ -11,11 +11,14 @@ export default class DNCSim extends Sim {
 
     opener: Array<Skill>
     state: DancerState
+    teamGCD: number
+    queuedSkill: Skill
 
     constructor(player: Player, levelMod: LevelMod, maxTime: number, opener?: Array<Skill>, printLog?: boolean) {
         super(player, levelMod, maxTime, printLog);
         this.opener = opener
         this.state = new DancerState()
+        this.teamGCD = 0
         this.registerProcs()
         this.registerCooldowns()
     }
@@ -123,21 +126,33 @@ export default class DNCSim extends Sim {
             logLine += "D"
         }
 
-        //logLine = logLine + ` | Buffs: ${damageLog.comment?.buffs}`
+        logLine = logLine + ` | Buffs: ${damageLog.comment?.buffs}`
 
         console.log(logLine);
     }
 
     jumpTimeBy(time: number): void {
         this.state.procsJumpBy(time);
+        this.teamGCD = Math.max(this.teamGCD - time, 0)
         super.jumpTimeBy(time)
     }
 
+    simulateTeamGCD(): void {
+        let numToGen = 0
+
+        if (this.getBuff(dancerBuffs.technicalFinishBuff.name)) {
+            numToGen = 7
+        }else if (this.getBuff(dancerBuffs.standardFinishBuff.name)){
+            numToGen = 2
+        }
+
+        for (let i = 0; i < numToGen; i++) {
+            console.log("Team esprit")
+            this.generateEsprit(0.2)
+        }
+    }
+
     getNextGCD(): Skill {
-        /*
-        if (this.opener?.length) {
-            return this.opener.shift()
-        }*/
         if (this.state.getInDance()) {
             if (this.state.getStepsRemaining() > 0) {
                 return dancerSkills.step
@@ -172,32 +187,66 @@ export default class DNCSim extends Sim {
         return dancerSkills.cascade
     }
 
+    jumpToNextEvent(filter: boolean = false): void {
+        let toJump: Array<number> = [this.autoAttackTimer, this.gcdTimer, this.teamGCD]
+        if (!filter)
+            toJump.push(this.animLock)
+
+        //console.log(JSON.stringify(toJump))
+
+        toJump = toJump.sort((p1, p2) => p1 - p2)
+
+        if (toJump[0]) {
+            this.jumpTimeBy(toJump[0])
+        }
+    }
+
     //Figure out if we should do a gcd, ogcd, auto attack, wait etc
-    doNextAction(): DamageLog {
-        if (this.autoAttackTimer > this.animLock) {
-            this.jumpAnimationLock()
+    doNextAction(filter: boolean = false): DamageLog {
+        this.jumpToNextEvent(filter)
+
+        if (!this.queuedSkill && this.opener.length > 0) {
+            this.queuedSkill = this.opener.shift()
         }
-        if (this.autoAttackTimer < this.gcdTimer && this.autoAttackTimer < this.animLock) {
-            return this.doAutoAttack();
+
+        if (this.teamGCD === 0) {
+            this.simulateTeamGCD()
+            console.log("thing")
+            this.teamGCD = 2.5
         }
-        if (this.opener?.length) {
-            let nextSkill: Skill = this.opener.shift()
-            if (nextSkill.isGCD) {
-                return this.doNextGCD(nextSkill)
-            } else {
-                return this.doNextOGCD(nextSkill)
-            }
-        }
-        let nextOGCD: Skill = this.getNextOGCD()
-        if (nextOGCD) {
-            return this.doNextOGCD()
-        }
-        if (this.autoAttackTimer > this.gcdTimer) {
-            return this.doNextGCD()
-        }
-        else {
+        if (this.autoAttackTimer === 0) {
             return this.doAutoAttack()
         }
+        if (this.queuedSkill) {
+            if (this.gcdTimer === 0) {
+                if (this.queuedSkill.isGCD) {
+                    const queuedSkill = this.queuedSkill
+                    this.queuedSkill = null
+                    return this.doNextGCD(queuedSkill)
+                }
+            }
+            if (this.animLock === 0) {
+                if (!this.queuedSkill.isGCD) {
+                    const queuedSkill = this.queuedSkill
+                    this.queuedSkill = null
+                    return this.doNextOGCD(queuedSkill)
+                }
+                this.jumpToNextEvent(true)
+            }
+        } else {
+            if (this.gcdTimer === 0) {
+                return this.doNextGCD()
+            }
+            if (this.animLock === 0) {
+                let nextOGCD: Skill = this.getNextOGCD()
+                if (nextOGCD) {
+                    return this.doNextOGCD()
+                } else {
+                    this.jumpToNextEvent(true)
+                }
+            }
+        }
+        return null
     }
 
     getNextOGCD(): Skill {
@@ -238,8 +287,9 @@ export default class DNCSim extends Sim {
     doNextGCD(skill?: Skill): DamageLog {
         this.jumpToNextGCD();
 
-        if (!skill)
+        if (!skill) {
             skill = this.getNextGCD()
+        }
 
         const damageLog: DamageLog = this.useSkill(skill)
 
@@ -267,8 +317,10 @@ export default class DNCSim extends Sim {
         let damageLog: DamageLog;
         while (this.getCurrentTime() < this.maxTime) {
             damageLog = this.doNextAction();
-            this.log.push(damageLog)
-            //this.printDamageLogLine(damageLog)
+            if (damageLog) {
+                this.log.push(damageLog)
+                //this.printDamageLogLine(damageLog)
+            }
         }
     }
 
