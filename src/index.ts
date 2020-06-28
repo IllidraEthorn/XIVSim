@@ -74,7 +74,9 @@ let sim: DNCSim = new DNCSim(dancerBIS, levelMod80, 150, [
     dancerSkills.step,
     dancerSkills.step,
     dancerSkills.technicalFinish,
-    dancerSkills.flourish
+    dancerSkills.flourish,
+    dancerSkills.risingWindmill,
+    dancerSkills.devilment
 ]);
 
 sim.run();

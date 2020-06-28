@@ -90,7 +90,7 @@ export default class DancerState {
             this.removeProc(proc)
         }
 
-        this.procs.push({ name: proc.name, duration: proc.duration })
+        this.procs.push({ name: proc.name, duration: proc.duration * 100 })
 
         this.procs.sort((p1, p2) => p1.duration - p2.duration)
     }

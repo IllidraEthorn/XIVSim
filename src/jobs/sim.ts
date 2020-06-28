@@ -29,7 +29,7 @@ export default abstract class Sim {
         this.levelMod = levelMod
         this.printLog = printLog
         this.currentTime = 0
-        this.maxTime = maxTime
+        this.maxTime = maxTime * 100
         this.damageDealt = 0
         this.gcdTimer = 0
         this.comboTimer = 0
@@ -71,8 +71,8 @@ export default abstract class Sim {
     summary(): any {
         return {
             totalDamage: this.damageDealt,
-            dps: (this.damageDealt / this.currentTime).toFixed(2),
-            duration: this.currentTime,
+            dps: (this.damageDealt * 100 / this.currentTime).toFixed(2),
+            duration: this.currentTime / 100,
             totalActions: this.log.length
         }
     }
@@ -125,11 +125,11 @@ export default abstract class Sim {
 
         if (skill.comboInteraction) {
             this.comboAction = skill;
-            this.comboTimer = 10;
+            this.comboTimer = 10 * 100;
         }
 
         if (skill.animationLock) {
-            this.animLock = skill.animationLock
+            this.animLock = skill.animationLock * 100
         }
 
         return damageLog
@@ -202,7 +202,7 @@ export default abstract class Sim {
             this.removeCooldown(cooldown)
         }
 
-        this.cooldowns.push(cooldown)
+        this.cooldowns.push({ name: cooldown.name, duration: cooldown.duration * 100 })
 
         this.cooldowns.sort((p1, p2) => p1.duration - p2.duration)
     }
@@ -240,7 +240,7 @@ export default abstract class Sim {
             this.removeBuff(buff)
         }
 
-        this.buffs.push(buff)
+        this.buffs.push({ name: buff.name, duration: buff.duration * 100 })
 
         this.buffs.sort((p1, p2) => p1.duration - p2.duration)
     }
