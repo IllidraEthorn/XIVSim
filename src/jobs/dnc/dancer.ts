@@ -26,12 +26,16 @@ const globalAnimLock: number = 0.75
 //Not sure how to type this
 const flourishingCascade: Proc = { name: "Flourishing Cascade", duration: 20 }
 const flourishingFountain: Proc = { name: "Flourishing Fountain", duration: 20 }
+const flourishingWindmill: Proc = { name: "Flourishing Windmill", duration: 20 }
+const flourishingShower: Proc = { name: "Flourishing Shower", duration: 20 }
 
 const flourishingFanDance: Proc = { name: "Flourishing Fan Dance", duration: 20 }
 
 const procs = {
     flourishingCascade,
     flourishingFountain,
+    flourishingWindmill,
+    flourishingShower,
 
     flourishingFanDance
 }
@@ -92,6 +96,26 @@ const reverseCascade: Skill = {
 
 const fountainFall: Skill = {
     name: "Fountainfall",
+    baseCastTime: 0,
+    baseRecastTime: 2.5,
+    potency: 350,
+    traitDamageMult: globalTraitMult,
+    isGCD: true,
+    animationLock: globalAnimLock
+}
+
+const risingWindmill: Skill = {
+    name: "Rising Windmill",
+    baseCastTime: 0,
+    baseRecastTime: 2.5,
+    potency: 300,
+    traitDamageMult: globalTraitMult,
+    isGCD: true,
+    animationLock: globalAnimLock
+}
+
+const bloodshower: Skill = {
+    name: "Bloodshower",
     baseCastTime: 0,
     baseRecastTime: 2.5,
     potency: 350,
@@ -218,6 +242,8 @@ const skills = {
     reverseCascade,
     fountain,
     fountainFall,
+    risingWindmill,
+    bloodshower,
     saberDance,
     flourish,
     standardStep,
