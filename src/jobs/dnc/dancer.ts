@@ -38,10 +38,12 @@ const procs = {
 
 const standardFinishBuff: Buff = { name: "Standard Finish", duration: 60 }
 const technicalFinishBuff: Buff = { name: "Technical Finish", duration: 20 }
+const devilmentBuff: Buff = { name: "Devilment", duration: 20 }
 
 const buffs = {
     standardFinishBuff,
-    technicalFinishBuff
+    technicalFinishBuff,
+    devilmentBuff
 }
 
 const autoAttack: AutoAttack = {
@@ -98,6 +100,16 @@ const fountainFall: Skill = {
     animationLock: globalAnimLock
 }
 
+const saberDance: Skill = {
+    name: "Saber Dance",
+    baseCastTime: 0,
+    baseRecastTime: 2.5,
+    potency: 600,
+    traitDamageMult: globalTraitMult,
+    isGCD: true,
+    animationLock: globalAnimLock
+}
+
 const flourish: Skill = {
     name: "Flourish",
     baseCastTime: 0,
@@ -116,6 +128,16 @@ const standardStep: Skill = {
     traitDamageMult: 0,
     isGCD: true,
     animationLock: 1.5
+}
+
+const prePullStandard: Skill ={
+    name: "Standard Finish",
+    baseCastTime: 0,
+    baseRecastTime: 1.5,
+    potency: 1000,
+    traitDamageMult: globalTraitMult,
+    isGCD: true,
+    animationLock: globalAnimLock
 }
 
 const technicalStep: Skill = {
@@ -157,10 +179,20 @@ const technicalFinish: Skill = {
     animationLock: globalAnimLock
 }
 
+const devilment: Skill = {
+    name: "Devilment",
+    baseCastTime: 0,
+    baseRecastTime: 120,
+    cooldown: 120,
+    traitDamageMult: 0,
+    isGCD: false,
+    animationLock: globalAnimLock
+}
+
 const fanDance: Skill = {
     name: "Fan Dance",
     baseCastTime: 0,
-    baseRecastTime: 1.00,
+    baseRecastTime: 0.75,
     potency: 150,
     cooldown: 1.00,
     traitDamageMult: globalTraitMult,
@@ -186,14 +218,17 @@ const skills = {
     reverseCascade,
     fountain,
     fountainFall,
+    saberDance,
     flourish,
     standardStep,
     technicalStep,
     step,
     standardFinish,
+    prePullStandard,
     technicalFinish,
     fanDance,
-    fanDance3
+    fanDance3,
+    devilment
 }
 
 export { jobMods as dancerJobMods };

@@ -4,7 +4,7 @@ import AutoAttack from "../autoattack";
 import DamageLog from "../damagelog";
 import Sim from "../sim";
 import Skill from "../skill";
-import { dancerAutoAttack, dancerProcs, dancerSkills, dancerBuffs } from "./dancer";
+import { dancerAutoAttack, dancerBuffs, dancerProcs, dancerSkills } from "./dancer";
 import DancerState from "./dancerstate";
 
 export default class DNCSim extends Sim {
@@ -20,9 +20,10 @@ export default class DNCSim extends Sim {
         this.registerCooldowns()
     }
 
-    getDancerComment(): { feathers: number, procs: string, buffs: string } {
+    getDancerComment(): { feathers: number, esprit: number, procs: string, buffs: string } {
         return {
             feathers: this.state.getFeathers(),
+            esprit: this.state.getEsprit(),
             procs: this.state.getProcs().reduce((acc: string, proc) => {
                 return acc + `${proc.name}(${proc.duration.toFixed(2)}) `
             }, ""),
@@ -88,6 +89,9 @@ export default class DNCSim extends Sim {
         let mult: number = 0
         this.getBuffs().forEach((buff) => {
             switch (buff.name) {
+                case dancerBuffs.devilmentBuff.name:
+                    mult = mult + 0.2
+                    break
                 default:
                     break
             }
@@ -96,11 +100,21 @@ export default class DNCSim extends Sim {
     }
 
     calcDHitChanceFromBuffs(): number {
-        return 0
+        let mult: number = 0
+        this.getBuffs().forEach((buff) => {
+            switch (buff.name) {
+                case dancerBuffs.devilmentBuff.name:
+                    mult = mult + 0.2
+                    break
+                default:
+                    break
+            }
+        })
+        return mult
     }
 
     printDamageLogLine(damageLog: DamageLog): void {
-        let logLine: string = `${damageLog.timestamp.toFixed(2).padStart(6, ' ')}| ${damageLog.potency.toString().padStart(4, ' ')}p | Feathers: ${damageLog.comment?.feathers} | ${damageLog.damage.toString().padStart(6, ' ')} | ${damageLog.name}`;
+        let logLine: string = `${damageLog.timestamp.toFixed(2).padStart(6, ' ')}| ${damageLog.potency.toString().padStart(4, ' ')}p | Feathers: ${damageLog.comment?.feathers} Esprit: ${damageLog.comment?.esprit.toString().padStart(3, ' ')} | ${damageLog.damage.toString().padStart(6, ' ')} | ${damageLog.name} `;
 
         if (damageLog.crit) {
             logLine += "C"
@@ -109,7 +123,7 @@ export default class DNCSim extends Sim {
             logLine += "D"
         }
 
-        logLine = logLine + ` | Buffs: ${damageLog.comment?.buffs}`
+        //logLine = logLine + ` | Buffs: ${damageLog.comment?.buffs}`
 
         console.log(logLine);
     }
@@ -120,9 +134,10 @@ export default class DNCSim extends Sim {
     }
 
     getNextGCD(): Skill {
+        /*
         if (this.opener?.length) {
             return this.opener.shift()
-        }
+        }*/
         if (this.state.getInDance()) {
             if (this.state.getStepsRemaining() > 0) {
                 return dancerSkills.step
@@ -142,6 +157,9 @@ export default class DNCSim extends Sim {
         if (!this.getCooldown(dancerSkills.technicalStep.name)) {
             return dancerSkills.technicalStep
         }
+        if (this.state.getEsprit() >= 50 && this.shouldUseSaberDance()) {
+            return dancerSkills.saberDance
+        }
         if (this.state.getProcByName(dancerProcs.flourishingFountain.name)) {
             return dancerSkills.fountainFall
         }
@@ -159,6 +177,17 @@ export default class DNCSim extends Sim {
         if (this.autoAttackTimer > this.animLock) {
             this.jumpAnimationLock()
         }
+        if (this.autoAttackTimer < this.gcdTimer && this.autoAttackTimer < this.animLock) {
+            return this.doAutoAttack();
+        }
+        if (this.opener?.length) {
+            let nextSkill: Skill = this.opener.shift()
+            if (nextSkill.isGCD) {
+                return this.doNextGCD(nextSkill)
+            } else {
+                return this.doNextOGCD(nextSkill)
+            }
+        }
         let nextOGCD: Skill = this.getNextOGCD()
         if (nextOGCD) {
             return this.doNextOGCD()
@@ -175,24 +204,29 @@ export default class DNCSim extends Sim {
         if (this.animLock > 0) {
             return null
         }
+        if (!this.getCooldown(dancerSkills.devilment.name) && dancerSkills.devilment.animationLock <= this.gcdTimer && this.shouldUseDevilment()) {
+            return dancerSkills.devilment
+        }
         if (!this.getCooldown(dancerSkills.flourish.name) && dancerSkills.flourish.animationLock <= this.gcdTimer && this.shouldUseFlourish()) {
             return dancerSkills.flourish
         }
-        if (!this.getCooldown(dancerSkills.fanDance3.name) && dancerSkills.fanDance.animationLock <= this.gcdTimer && this.state.getProcByName(dancerProcs.flourishingFanDance.name)) {
+        if (!this.getCooldown(dancerSkills.fanDance3.name) && dancerSkills.fanDance3.animationLock <= this.gcdTimer && this.state.getProcByName(dancerProcs.flourishingFanDance.name)) {
             return dancerSkills.fanDance3
         }
-        if (!this.getCooldown(dancerSkills.fanDance.name) && dancerSkills.fanDance.animationLock <= this.gcdTimer && this.shouldUseFanDance()) {
+        if (!(this.getCooldown(dancerSkills.fanDance.name)) && dancerSkills.fanDance.animationLock <= this.gcdTimer && this.shouldUseFanDance()) {
             return dancerSkills.fanDance
         }
         return null
     }
 
-    doNextOGCD(): DamageLog {
-        const nextOGCD = this.getNextOGCD()
+    doNextOGCD(skill?: Skill): DamageLog {
+        if (!skill) {
+            skill = this.getNextOGCD()
+        }
 
         let damageLog: DamageLog;
 
-        damageLog = this.useSkill(nextOGCD)
+        damageLog = this.useSkill(skill)
         if (damageLog.damage > 0) {
             this.dealDamage(damageLog.damage)
         }
@@ -201,16 +235,17 @@ export default class DNCSim extends Sim {
     }
 
     //Perform the next gcd
-    doNextGCD(): DamageLog {
+    doNextGCD(skill?: Skill): DamageLog {
         this.jumpToNextGCD();
 
-        const nextGCD = this.getNextGCD()
+        if (!skill)
+            skill = this.getNextGCD()
 
-        const damageLog: DamageLog = this.useSkill(nextGCD)
+        const damageLog: DamageLog = this.useSkill(skill)
 
         this.dealDamage(damageLog.damage);
 
-        this.gcdTimer = nextGCD.baseRecastTime;
+        this.gcdTimer = skill.baseRecastTime;
 
         return damageLog;
     }
@@ -239,12 +274,14 @@ export default class DNCSim extends Sim {
 
     registerProcs(): void {
         dancerSkills.cascade.onUse = (damageLog: DamageLog) => {
+            this.generateEsprit()
             if (Math.random() < dancerSkills.cascade.procChance) {
                 this.state.addProc(dancerSkills.cascade.proc)
             }
         }
 
         dancerSkills.fountain.onUse = (damageLog: DamageLog) => {
+            this.generateEsprit()
             if (Math.random() < dancerSkills.fountain.procChance) {
                 this.state.addProc(dancerSkills.fountain.proc)
             }
@@ -264,16 +301,20 @@ export default class DNCSim extends Sim {
         }
 
         dancerSkills.reverseCascade.onUse = (damageLog: DamageLog) => {
+            this.generateEsprit()
             this.state.removeProc(dancerProcs.flourishingCascade)
             this.featherProc(0.5)
         }
 
         dancerSkills.fountainFall.onUse = (damageLog: DamageLog) => {
+            this.generateEsprit()
             this.state.removeProc(dancerProcs.flourishingFountain)
             this.featherProc(0.5)
         }
 
-
+        dancerSkills.saberDance.onUse = (damageLog: DamageLog) => {
+            this.state.removeEsprit(50)
+        }
     }
 
     registerCooldowns(): void {
@@ -282,6 +323,11 @@ export default class DNCSim extends Sim {
             this.state.addProc(dancerProcs.flourishingCascade)
             this.state.addProc(dancerProcs.flourishingFountain)
             this.state.addProc(dancerProcs.flourishingFanDance)
+        }
+
+        dancerSkills.devilment.onUse = (damageLog: DamageLog) => {
+            this.addCooldown({ name: dancerSkills.devilment.name, duration: dancerSkills.devilment.cooldown })
+            this.addBuff({ name: dancerBuffs.devilmentBuff.name, duration: dancerBuffs.devilmentBuff.duration })
         }
 
         dancerSkills.standardStep.onUse = (damageLog: DamageLog) => {
@@ -309,6 +355,13 @@ export default class DNCSim extends Sim {
             this.addBuff({ name: dancerBuffs.standardFinishBuff.name, duration: dancerBuffs.standardFinishBuff.duration })
         }
 
+        dancerSkills.prePullStandard.onUse = (damageLog: DamageLog) => {
+            this.triggerGCD(1.5)
+            this.state.setInStandard(false)
+            this.addBuff({ name: dancerBuffs.standardFinishBuff.name, duration: dancerBuffs.standardFinishBuff.duration })
+            this.addCooldown({ name: dancerSkills.standardStep.name, duration: dancerSkills.standardStep.cooldown - 15 })
+        }
+
         dancerSkills.technicalFinish.onUse = (damageLog: DamageLog) => {
             this.triggerGCD(1.5)
             this.state.setInTechnical(false)
@@ -332,9 +385,38 @@ export default class DNCSim extends Sim {
     }
 
     shouldUseFanDance(): boolean {
-        if (this.state.getProcByName(dancerProcs.flourishingFanDance.name) || (this.state.getFeathers() < 4)) {
+        if (!this.isBursting() && (this.state.getProcByName(dancerProcs.flourishingFanDance.name) || (this.state.getFeathers() < 4))) {
             return false
+        } else if (this.state.getFeathers() > 0) {
+            return true
         }
-        return true
+        return false
+    }
+
+    generateEsprit(chance: number = 0.3): void {
+        if (Math.random() < chance) {
+            this.state.addEsprit(10)
+        }
+    }
+
+    shouldUseDevilment(): boolean {
+        if (this.getBuff(dancerBuffs.technicalFinishBuff.name)) {
+            return true
+        }
+        return false
+    }
+
+    shouldUseSaberDance(): boolean {
+        if (this.state.getEsprit() > 80 || this.isBursting()) {
+            return true
+        }
+        return false
+    }
+
+    isBursting(): boolean {
+        if (this.getBuff(dancerBuffs.technicalFinishBuff.name)) {
+            return true
+        }
+        return false
     }
 }

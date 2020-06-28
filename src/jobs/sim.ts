@@ -90,22 +90,28 @@ export default abstract class Sim {
             this.comboTimer = 0
         }
 
-        const baseDamage: number = calcDamage(potency, this.levelMod, this.player.jobMod.mainStat(), this.player.stats.weaponDamage, this.player.stats.mainStat, this.player.stats.det, this.player.stats.tenacity, 1.2)
-        const critC: number = critChance(this.levelMod, this.player.stats.crit) / 100 + this.calcCritChanceFromBuffs();
-        const dhitC: number = directHitChance(this.levelMod, this.player.stats.dhit) / 100 + this.calcDHitChanceFromBuffs();
-
-        let damage: number = Math.floor(baseDamage * this.calcDamageMultFromBuffs())
         let chit = false
         let dhit = false;
+        let damage: number = 0
 
-        if (Math.random() <= critC) {
-            damage = Math.floor(damage * critDamageBonus(this.levelMod, this.player.stats.crit));
-            chit = true;
-        }
+        if (potency > 0) {
+            const baseDamage: number = calcDamage(potency, this.levelMod, this.player.jobMod.mainStat(), this.player.stats.weaponDamage, this.player.stats.mainStat, this.player.stats.det, this.player.stats.tenacity, 1.2)
+            const critC: number = critChance(this.levelMod, this.player.stats.crit) / 100 + this.calcCritChanceFromBuffs();
+            const dhitC: number = directHitChance(this.levelMod, this.player.stats.dhit) / 100 + this.calcDHitChanceFromBuffs();
 
-        if (Math.random() <= dhitC) {
-            damage = Math.floor(damage * 1.25);
-            dhit = true;
+            damage = Math.floor(baseDamage * this.calcDamageMultFromBuffs())
+
+            if (Math.random() <= critC) {
+                damage = Math.floor(damage * critDamageBonus(this.levelMod, this.player.stats.crit));
+                chit = true;
+            }
+
+            if (Math.random() <= dhitC) {
+                damage = Math.floor(damage * 1.25);
+                dhit = true;
+            }
+        } else {
+            damage = 0
         }
 
         const damageLog: DamageLog = {
@@ -151,7 +157,7 @@ export default abstract class Sim {
 
         let damage: number = Math.floor(baseDamage * this.calcDamageMultFromBuffs())
 
-        console.log("Mult", this.calcDamageMultFromBuffs())
+        //console.log("Mult", this.calcDamageMultFromBuffs())
         let chit = false
         let dhit = false;
 
