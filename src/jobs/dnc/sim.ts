@@ -130,7 +130,7 @@ export default class DNCSim extends Sim {
             logLine += "D"
         }
 
-        //logLine = logLine + ` | Procs: ${damageLog.comment?.procs}`
+        logLine = logLine + ` | Procs: ${damageLog.comment?.procs}`
 
         //logLine = logLine + ` | GCD Timer: ${damageLog.comment?.gcdTimer}`
 
@@ -181,20 +181,14 @@ export default class DNCSim extends Sim {
         if (!this.getCooldown(dancerSkills.technicalStep.name)) {
             return dancerSkills.technicalStep
         }
+        if (this.getShortestGCDProcTimer().procs * 250 > this.getShortestGCDProcTimer().duration) {
+            return this.getGCDProcToUse()
+        }
         if (this.state.getEsprit() >= 50 && this.shouldUseSaberDance()) {
             return dancerSkills.saberDance
         }
-        if (this.state.getProcByName(dancerProcs.flourishingFountain.name)) {
-            return dancerSkills.fountainFall
-        }
-        if (this.state.getProcByName(dancerProcs.flourishingShower.name)) {
-            return dancerSkills.bloodshower
-        }
-        if (this.state.getProcByName(dancerProcs.flourishingCascade.name)) {
-            return dancerSkills.reverseCascade
-        }
-        if (this.state.getProcByName(dancerProcs.flourishingWindmill.name)) {
-            return dancerSkills.risingWindmill
+        if (this.getGCDProcToUse()) {
+            return this.getGCDProcToUse()
         }
         if (this.comboAction == dancerSkills.cascade) {
             return dancerSkills.fountain
@@ -206,8 +200,6 @@ export default class DNCSim extends Sim {
         let toJump: Array<number> = [this.autoAttackTimer, this.gcdTimer, this.teamGCD, this.cooldowns[0]?.duration]
         if (!filter)
             toJump.push(this.animLock)
-
-        //console.log(JSON.stringify(toJump))
 
         toJump = toJump.sort((p1, p2) => p1 - p2)
 
@@ -226,7 +218,7 @@ export default class DNCSim extends Sim {
 
         if (this.teamGCD === 0) {
             this.simulateTeamGCD()
-            console.log("thing", this.getCurrentTime())
+            //console.log("thing", this.getCurrentTime())
             this.teamGCD = 250
         }
         if (this.autoAttackTimer === 0) {
@@ -509,5 +501,37 @@ export default class DNCSim extends Sim {
             return true
         }
         return false
+    }
+
+    getGCDProcToUse(): Skill {
+        if (this.state.getProcByName(dancerProcs.flourishingFountain.name)) {
+            return dancerSkills.fountainFall
+        }
+        if (this.state.getProcByName(dancerProcs.flourishingShower.name)) {
+            return dancerSkills.bloodshower
+        }
+        if (this.state.getProcByName(dancerProcs.flourishingCascade.name)) {
+            return dancerSkills.reverseCascade
+        }
+        if (this.state.getProcByName(dancerProcs.flourishingWindmill.name)) {
+            return dancerSkills.risingWindmill
+        }
+        return null
+    }
+
+    getShortestGCDProcTimer(): { duration: number, procs: number } {
+
+        let procArray: Array<number> = [
+            this.state.getProcByName(dancerProcs.flourishingFountain.name)?.duration,
+            this.state.getProcByName(dancerProcs.flourishingShower.name)?.duration,
+            this.state.getProcByName(dancerProcs.flourishingCascade.name)?.duration,
+            this.state.getProcByName(dancerProcs.flourishingWindmill.name)?.duration
+        ].filter((val) => val > 0)
+
+        const toReturn = {
+            duration: Math.min(...procArray),
+            procs: procArray.length
+        }
+        return toReturn
     }
 }

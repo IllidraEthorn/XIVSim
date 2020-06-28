@@ -71,7 +71,7 @@ export default class DancerState {
         return this.procs
     }
 
-    getProcByName(name: string): Proc | any {
+    getProcByName(name: string): Proc {
         return this.procs.find((proc: Proc) => {
             if (proc.name === name) {
                 return true
