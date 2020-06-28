@@ -1,8 +1,8 @@
 import AutoAttack from "../autoattack";
+import Buff from "../buff";
 import JobMods from "../jobmods";
 import Proc from "../proc";
 import Skill from "../skill";
-import Buff from "../buff";
 
 const jobMods: JobMods = {
     hp: 105,
@@ -154,7 +154,7 @@ const standardStep: Skill = {
     animationLock: 1.5
 }
 
-const prePullStandard: Skill ={
+const prePullStandard: Skill = {
     name: "Standard Finish",
     baseCastTime: 0,
     baseRecastTime: 1.5,
@@ -218,7 +218,7 @@ const fanDance: Skill = {
     baseCastTime: 0,
     baseRecastTime: 0.75,
     potency: 150,
-    cooldown: 1.00,
+    cooldown: 1.01,
     traitDamageMult: globalTraitMult,
     isGCD: false,
     animationLock: globalAnimLock,
@@ -262,3 +262,4 @@ export { skills as dancerSkills };
 export { autoAttack as dancerAutoAttack };
 export { procs as dancerProcs };
 export { buffs as dancerBuffs };
+
