@@ -17,6 +17,9 @@
     "typescript": "^3.7.5"
   },
   "scripts": {
+    "startTest": "node build/indexTest.js",
+    "prestartTest": "npm run buildTest",
+    "buildTest": "tsc --project tsconfigtest.json --pretty",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

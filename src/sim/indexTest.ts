@@ -73,4 +73,4 @@ let sim: DNCSim = new DNCSim(dancerBIS, levelMod80, 150, opener);
 
 sim.run();
 sim.log.forEach((damageLog) => { sim.printDamageLogLine(damageLog) });
-console.log(sim.summary());
+console.log(sim.summary(), "HEY");
