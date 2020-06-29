@@ -6,7 +6,7 @@ export interface LevelMod {
     threat: number
 }
 
-const levelMod80 = {
+const levelMod80: LevelMod = {
     mp: 10000,
     main: 340,
     sub: 380,

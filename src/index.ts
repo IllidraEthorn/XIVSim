@@ -4,6 +4,7 @@ import { jobMods } from "./jobs/jobmods";
 import { Player } from "./player/player";
 import { dancerSkills } from "./jobs/dnc/dancer";
 import Skill from "./jobs/skill";
+import { speedMult } from "./util/damagecalc";
 
 const dancer: Player = {
     stats: {
@@ -63,21 +64,12 @@ const opener: Array<Skill> = [
     dancerSkills.step,
     dancerSkills.step,
     dancerSkills.technicalFinish,
-    dancerSkills.flourish
-]
-
-let sim: DNCSim = new DNCSim(dancerBIS, levelMod80, 150, [
-    dancerSkills.prePullStandard, 
-    dancerSkills.technicalStep,
-    dancerSkills.step,
-    dancerSkills.step,
-    dancerSkills.step,
-    dancerSkills.step,
-    dancerSkills.technicalFinish,
     dancerSkills.flourish,
     dancerSkills.risingWindmill,
     dancerSkills.devilment
-]);
+]
+
+let sim: DNCSim = new DNCSim(dancerBIS, levelMod80, 150, opener);
 
 sim.run();
 sim.log.forEach((damageLog) => { sim.printDamageLogLine(damageLog) });
