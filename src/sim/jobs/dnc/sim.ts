@@ -59,6 +59,7 @@ export default class DNCSim extends Sim {
             return {
                 name: skill.name,
                 damage: 0,
+                totalDamage: this.damageDealt,
                 potency: 0,
                 directHit: false,
                 crit: false,
@@ -340,6 +341,7 @@ export default class DNCSim extends Sim {
                 this.log.push({
                     name: "Verbose",
                     damage: 0,
+                    totalDamage: this.damageDealt,
                     potency: 0,
                     directHit: false,
                     crit: false,

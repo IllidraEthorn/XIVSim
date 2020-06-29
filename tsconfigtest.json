@@ -7,12 +7,12 @@
             "es2017",
             "es2016.array.include"
         ],
-        "outDir": "build",
+        "outDir": "buildTest",
         "sourceMap": true,
         "removeComments": true,
         "declaration": true,
         "strict": false,
-        "declarationDir": "build/types",
+        "declarationDir": "buildTest/types",
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "noImplicitReturns": true,
@@ -29,7 +29,7 @@
     ],
     "exclude": [
         "node_modules",
-        "build",
+        "buildTest",
         "sandbox",
         "*.js",
         "**/__tests__/**"
