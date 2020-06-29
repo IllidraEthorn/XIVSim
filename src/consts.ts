@@ -1,5 +1,5 @@
 import { IJourney } from './interfaces/journeys';
-
+import { createMemoryHistory } from 'history'
 export const FORM_NAME = 'editQuestion';
 export const FORM_NEW_QUIZ = 'newQuiz';
 export const FORM_EDIT_CATEGORY = 'editCategory';
@@ -16,12 +16,12 @@ export const JOURNEY: IJourney = {
 
   rootJourney: [
     {
-      path: '',
+      path: process.env.PUBLIC_URL,
       elementId: 'main',
       children: [
-        { path: '/XIVSim', elementId: 'welcome', label: 'Home', icon: 'home' },
+        { path: '/', elementId: 'welcome', label: 'Home', icon: 'home' },
         'divider',
-        { path: '/XIVSim/counter', elementId: 'counter', label: 'Counter' },
+        { path: '/DNCDemo', elementId: 'dncdemo', label: 'Dancer Demo' },
       ],
     },
   ],

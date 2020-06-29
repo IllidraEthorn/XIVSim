@@ -57,9 +57,9 @@ class DamageChart extends Component<{}, { options: {}, series: any }> {
 
         let data: Array<number[][]> = []
 
-        for (let i = 0; i < 500; i++) {
+        for (let i = 0; i < 1; i++) {
             sim.run()
-            data.push(sim.createDataPointsPerSecond())
+            data.push(sim.createDataPointsPerSecondNew())
         }
 
         let dataAvg: number[][] = []
@@ -92,7 +92,7 @@ class DamageChart extends Component<{}, { options: {}, series: any }> {
             series: [
             {
                 name: 'dps2',
-                data: smooth(dataAvg, 30, (val)=>val[1], (val,valsmoothed)=>[val[0], Math.floor(valsmoothed)])
+                data: smooth(smooth(dataAvg, 30, (val)=>val[1], (val,valsmoothed)=>[val[0], Math.floor(valsmoothed)]), 5, (val)=>val[1], (val,valsmoothed)=>[val[0], Math.floor(valsmoothed)])
             }]
         }
     }

@@ -29,18 +29,10 @@ let Welcome = () => {
 
   return (
     <>
-      <Card className={classes.root}>
+      <Card>
         <CardContent>
-          <Typography className={classes.title} color="textSecondary" gutterBottom>
-            Welcome
-        </Typography>
-          <Typography variant="body2" component="p">
-            Welcome to XIVSim
-        </Typography>
+          <DamageChart />
         </CardContent>
-        <CardActions>
-          <Button size="small">Learn More</Button>
-        </CardActions>
       </Card>
     </>
   );

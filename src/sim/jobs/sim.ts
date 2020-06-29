@@ -305,6 +305,19 @@ export default abstract class Sim {
         return newArr
     }
 
+    createDataPointsPerSecondNew(): Array<number[]> {
+        let newArr: number[][] = []
+        for (let i = 0; i < Math.ceil(this.log[this.log.length - 1].timestamp / 100) + 1; i++) {
+            newArr.push([i, 0])
+        }
+        console.log("Length: ", newArr.length)
+        console.log(newArr)
+        this.log.forEach((damageLog) => {
+            newArr[Math.ceil(damageLog.timestamp / 100)][1] = newArr[Math.ceil(damageLog.timestamp / 100)][1] + damageLog.damage
+        })
+        return newArr
+    }
+
     abstract printDamageLogLine(damageLog: DamageLog): void;
 
     abstract getNextGCD(): Skill;
