@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "19ba9b071d4a0c262eca10295f2a7a15",
+    "revision": "4c28cec3089af57331490df6100c05f2",
     "url": "/XIVSim/index.html"
   },
   {
