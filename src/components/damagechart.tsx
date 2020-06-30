@@ -10,7 +10,7 @@ class DamageChart extends Component<any, { options: {}, series: any }> {
         this.state = {
             options: {
                 chart: {
-                    id: 'dncDemo',
+                    id: 'dncDemoLine',
                     toolbar: {
                         show: true,
                         offsetX: 0,

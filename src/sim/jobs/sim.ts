@@ -7,6 +7,7 @@ import CommentLog from "./commentlog";
 import Cooldown from "./cooldown";
 import DamageLog from "./damagelog";
 import Skill from "./skill";
+import SimData, { AbilityDamage } from "./simdata";
 
 export default abstract class Sim {
     player: Player;
@@ -273,7 +274,7 @@ export default abstract class Sim {
         return 0
     }
 
-    createDataPoints(): Array<number[]> {
+    createDataPoints(): { damagePoints: Array<number[]> } {
         let newArr: number[][] = [[0, 0]]
         this.log.forEach((damageLog) => {
             if (damageLog.damage === 0) {
@@ -286,10 +287,10 @@ export default abstract class Sim {
                 newArr.push([damageLog.timestamp / 100, damageLog.damage])
             }
         })
-        return newArr
+        return { damagePoints: newArr }
     }
 
-    createDataPointsPerSecond(): Array<number[]> {
+    createDataPointsPerSecond(): { damagePoints: Array<number[]> } {
         let newArr: number[][] = [[0, 0]]
         this.log.forEach((damageLog) => {
             if (damageLog.damage === 0) {
@@ -302,18 +303,29 @@ export default abstract class Sim {
                 newArr.push([Math.floor(damageLog.timestamp / 100), damageLog.damage])
             }
         })
-        return newArr
+        return { damagePoints: newArr }
     }
 
-    createDataPointsPerSecondNew(): Array<number[]> {
+    createDataPointsPerSecondNew(): SimData {
         let newArr: number[][] = []
+        let abilityDamage: Array<AbilityDamage> = []
+        let ability: AbilityDamage
         for (let i = 0; i < Math.ceil(this.log[this.log.length - 1].timestamp / 100) + 1; i++) {
             newArr.push([i, 0])
         }
         this.log.forEach((damageLog) => {
             newArr[Math.ceil(damageLog.timestamp / 100)][1] = newArr[Math.ceil(damageLog.timestamp / 100)][1] + damageLog.damage
+
+            if (damageLog.damage > 0) {
+                ability = abilityDamage.find((val) => val.name === damageLog.name)
+                if (ability) {
+                    ability.damage += damageLog.damage
+                } else {
+                    abilityDamage.push({ name: damageLog.name, damage: damageLog.damage })
+                }
+            }
         })
-        return newArr
+        return { damagePoints: newArr, abilityDamage: abilityDamage, totalTime: this.currentTime/100 }
     }
 
     abstract printDamageLogLine(damageLog: DamageLog): void;

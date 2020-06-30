@@ -1,4 +1,6 @@
 import { IJourney } from './interfaces/journeys';
+import { jobMods } from './sim/jobs/jobmods';
+import { Player } from './sim/player/player';
 export const FORM_NAME = 'editQuestion';
 export const FORM_NEW_QUIZ = 'newQuiz';
 export const FORM_EDIT_CATEGORY = 'editCategory';
@@ -25,3 +27,17 @@ export const JOURNEY: IJourney = {
     },
   ],
 };
+
+export const dancerBIS: Player = {
+  stats: {
+    mainStat: 4871,
+    weaponDamage: 128,
+    crit: 3969,
+    det: 2067,
+    dhit: 2762,
+    spellSpeed: 380,
+    skillSpeed: 380,
+    tenacity: 380
+  },
+  jobMod: jobMods.dancer
+}
