@@ -16,7 +16,7 @@ export const JOURNEY: IJourney = {
 
   rootJourney: [
     {
-      path: process.env.PUBLIC_URL,
+      path: '',
       elementId: 'main',
       children: [
         { path: '/', elementId: 'welcome', label: 'Home', icon: 'home' },
