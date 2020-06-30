@@ -117,6 +117,7 @@ export default abstract class Sim {
         const damageLog: DamageLog = {
             name: skill.name,
             damage: damage,
+            totalDamage: this.damageDealt,
             potency: potency,
             directHit: dhit,
             crit: chit,
@@ -174,6 +175,7 @@ export default abstract class Sim {
         const damageLog: DamageLog = {
             name: "Auto Attack",
             damage: damage,
+            totalDamage: this.damageDealt,
             potency: autoAttack.potency,
             directHit: dhit,
             crit: chit,
@@ -269,6 +271,51 @@ export default abstract class Sim {
 
     calcDHitChanceFromBuffs(): number {
         return 0
+    }
+
+    createDataPoints(): Array<number[]> {
+        let newArr: number[][] = [[0, 0]]
+        this.log.forEach((damageLog) => {
+            if (damageLog.damage === 0) {
+                return
+            }
+            if (damageLog.timestamp / 100 === newArr[newArr.length - 1][0]) {
+                newArr[newArr.length - 1][1] = newArr[newArr.length - 1][1] + damageLog.damage
+            }
+            else {
+                newArr.push([damageLog.timestamp / 100, damageLog.damage])
+            }
+        })
+        return newArr
+    }
+
+    createDataPointsPerSecond(): Array<number[]> {
+        let newArr: number[][] = [[0, 0]]
+        this.log.forEach((damageLog) => {
+            if (damageLog.damage === 0) {
+                return
+            }
+            if (Math.floor(damageLog.timestamp / 100) === newArr[newArr.length - 1][0]) {
+                newArr[newArr.length - 1][1] = newArr[newArr.length - 1][1] + damageLog.damage
+            }
+            else {
+                newArr.push([Math.floor(damageLog.timestamp / 100), damageLog.damage])
+            }
+        })
+        return newArr
+    }
+
+    createDataPointsPerSecondNew(): Array<number[]> {
+        let newArr: number[][] = []
+        for (let i = 0; i < Math.ceil(this.log[this.log.length - 1].timestamp / 100) + 1; i++) {
+            newArr.push([i, 0])
+        }
+        console.log("Length: ", newArr.length)
+        console.log(newArr)
+        this.log.forEach((damageLog) => {
+            newArr[Math.ceil(damageLog.timestamp / 100)][1] = newArr[Math.ceil(damageLog.timestamp / 100)][1] + damageLog.damage
+        })
+        return newArr
     }
 
     abstract printDamageLogLine(damageLog: DamageLog): void;

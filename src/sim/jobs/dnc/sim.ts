@@ -59,6 +59,7 @@ export default class DNCSim extends Sim {
             return {
                 name: skill.name,
                 damage: 0,
+                totalDamage: this.damageDealt,
                 potency: 0,
                 directHit: false,
                 crit: false,
@@ -181,6 +182,15 @@ export default class DNCSim extends Sim {
         if (!this.getCooldown(dancerSkills.technicalStep.name)) {
             return dancerSkills.technicalStep
         }
+        //Ensure we dont let flourish drift
+        let flourishcd = this.getCooldown(dancerSkills.flourish.name) ? this.getCooldown(dancerSkills.flourish.name).duration : 0
+        if (this.state.getEsprit() >= 50 && this.getShortestGCDProcTimer().procs === 0 && flourishcd <= 250) {
+            return dancerSkills.saberDance
+        }
+        if (this.getShortestGCDProcTimer().procs > 0 && flourishcd <= 250) {
+            return this.getGCDProcToUse()
+        }
+
         if (this.getShortestGCDProcTimer().procs * 250 > this.getShortestGCDProcTimer().duration) {
             return this.getGCDProcToUse()
         }
@@ -260,16 +270,16 @@ export default class DNCSim extends Sim {
         if (this.animLock > 0) {
             return null
         }
-        if (!this.getCooldown(dancerSkills.devilment.name) && dancerSkills.devilment.animationLock <= this.gcdTimer && this.shouldUseDevilment()) {
+        if (!this.getCooldown(dancerSkills.devilment.name) && dancerSkills.devilment.animationLock * 100 <= this.gcdTimer && this.shouldUseDevilment()) {
             return dancerSkills.devilment
         }
-        if (!this.getCooldown(dancerSkills.flourish.name) && dancerSkills.flourish.animationLock <= this.gcdTimer && this.shouldUseFlourish()) {
+        if (!this.getCooldown(dancerSkills.flourish.name) && dancerSkills.flourish.animationLock * 100 <= this.gcdTimer && this.shouldUseFlourish()) {
             return dancerSkills.flourish
         }
-        if (!this.getCooldown(dancerSkills.fanDance3.name) && dancerSkills.fanDance3.animationLock <= this.gcdTimer && this.state.getProcByName(dancerProcs.flourishingFanDance.name)) {
+        if (!this.getCooldown(dancerSkills.fanDance3.name) && dancerSkills.fanDance3.animationLock * 100 <= this.gcdTimer && this.state.getProcByName(dancerProcs.flourishingFanDance.name)) {
             return dancerSkills.fanDance3
         }
-        if (!(this.getCooldown(dancerSkills.fanDance.name)) && dancerSkills.fanDance.animationLock <= this.gcdTimer && this.shouldUseFanDance()) {
+        if (!(this.getCooldown(dancerSkills.fanDance.name)) && dancerSkills.fanDance.animationLock * 100 <= this.gcdTimer && this.shouldUseFanDance()) {
             return dancerSkills.fanDance
         }
         return null
@@ -331,6 +341,7 @@ export default class DNCSim extends Sim {
                 this.log.push({
                     name: "Verbose",
                     damage: 0,
+                    totalDamage: this.damageDealt,
                     potency: 0,
                     directHit: false,
                     crit: false,

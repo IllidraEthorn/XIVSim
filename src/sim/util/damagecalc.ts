@@ -42,6 +42,10 @@ const autoAttack = (levelMod: LevelMod, jobMod: number, weaponDamage: number, we
     return (Math.floor(Math.floor(levelMod.main * jobMod / 1000 + weaponDamage) * (weaponDelay / 3)))
 }
 
+const adjustTimeToSpeed = (time: number, speed: number, levelMod: LevelMod) => {
+    return Math.floor(Math.floor(100 * 100 * (Math.floor(time * 1000 * (1000 - Math.floor(130 * speed - levelMod.sub / levelMod.div)) / 1000) / 1000)) / 100) / 100
+}
+
 const calcAutoAttackDamage = (potency: number, levelMod: LevelMod, jobMod: number, weaponDamage: number, weaponDelay: number, attackPower: number, determination: number, tenacity: number, traitMult: number, speed: number, range?: number) => {
     range = range ? range : randomRange(0.95, 1.05)
     return Math.floor(Math.floor(Math.floor(potencyMult(potency) * autoAttack(levelMod, jobMod, weaponDamage, weaponDelay) * attackPowerMult(attackPower) * detMult(levelMod, determination) * tenacityMult(levelMod, tenacity) * traitMult) * speedMult(levelMod, speed)) * range)
@@ -56,5 +60,5 @@ const calcDamageRange = (potency: number, levelMod: LevelMod, jobMod: number, we
     return `${calcDamage(potency, levelMod, jobMod, weaponDamage, attackPower, determination, tenacity, traitMult, 0.95)} - ${calcDamage(potency, levelMod, jobMod, weaponDamage, attackPower, determination, tenacity, traitMult, 1.05)}`
 }
 
-export { directHitChance, critChance, critDamageBonus, calcAutoAttackDamage, calcDamage };
+export { directHitChance, critChance, critDamageBonus, speedMult, adjustTimeToSpeed, calcAutoAttackDamage, calcDamage };
 
