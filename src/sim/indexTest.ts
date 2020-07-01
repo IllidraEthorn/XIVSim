@@ -4,6 +4,7 @@ import DNCSim from "./jobs/dnc/sim";
 import { jobMods } from "./jobs/jobmods";
 import Skill from "./jobs/skill";
 import { Player } from "./player/player";
+import movingAvg from "./util/movingaverage";
 
 const dancer: Player = {
     stats: {
@@ -61,12 +62,11 @@ const opener: Array<Skill> = [
 ]
 
 let sim: DNCSim = new DNCSim(dancerBIS, levelMod80, 150, opener);
-
+/*
 sim.run();
 //sim.log.forEach((damageLog) => { sim.printDamageLogLine(damageLog) });
 console.log(sim.summary(), "HEY1");
 
-sim = new DNCSim(dancerBIS, levelMod80, 150, opener);
-sim.run();
-//sim.log.forEach((damageLog) => { sim.printDamageLogLine(damageLog) });
-console.log(sim.summary(), "HEY2");
+*/
+
+console.log(movingAvg([10,0,0,0,0,0,0,0,0,0,0,0], 2))
