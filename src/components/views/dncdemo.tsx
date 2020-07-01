@@ -74,20 +74,29 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
       return prev
     }, [])
 
-    this.setState({ data: data, dataArea: dataArea }, () => {
-
+    dataArea.forEach((val) => {
+      val.damage.forEach((dmg) => {
+        dmg[1] = dmg[1] / data.length
+      })
     })
+
+    this.setState({ data: data, dataArea: dataArea })
   }
 
   async reset() {
+    let dataArea = [...this.state.dataArea]
+    dataArea.forEach((val) => {
+      val.damage.forEach((dmg) => {
+        dmg[1] = 0
+      })
+    })
+
+    console.log(dataArea)
+
     this.setState({
       data: [],
-      dataArea: []
+      dataArea: dataArea
     }, this.recalc)
-  }
-
-  smoothData(dataAvg, amount) {
-    return movingAvg(dataAvg, amount, (val) => val[1], (val, valsmoothed) => [val[0], Math.floor(valsmoothed)])
   }
 
   render() {
