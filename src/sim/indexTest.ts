@@ -61,12 +61,12 @@ const opener: Array<Skill> = [
     dancerSkills.devilment
 ]
 
-let sim: DNCSim = new DNCSim(dancerBIS, levelMod80, 150, opener);
-/*
+let sim: DNCSim = new DNCSim(dancerBIS, levelMod80, 30, opener);
+
 sim.run();
 //sim.log.forEach((damageLog) => { sim.printDamageLogLine(damageLog) });
 console.log(sim.summary(), "HEY1");
 
-*/
+console.log(sim.createDataPointsAreaChart())
 
-console.log(movingAvg([10,0,0,0,0,0,0,0,0,0,0,0], 2))
+//console.log(movingAvg([10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 2))
