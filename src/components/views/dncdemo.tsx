@@ -11,9 +11,10 @@ import Skill from '../../sim/jobs/skill';
 import movingAvg from '../../sim/util/movingaverage';
 import DamageChart from '../damagechart';
 import DamagePieChart from '../damagepiechart';
+import DamageAreaChart from '../damageareachart';
 
 
-class DNCDemo extends Component<{}, { pass1: number | string | Array<number | string>, pass2: number | string | Array<number | string>, data: number[][][], dataAvg: number[][], dataPie: SimData }>  {
+class DNCDemo extends Component<{}, { pass1: number | string | Array<number | string>, pass2: number | string | Array<number | string>, data: number[][][], dataAvg: number[][], dataPie: SimData, dataArea: Array<{ name: string, damage: Array<number[]> }> }>  {
   constructor(props) {
 
     super(props);
@@ -27,7 +28,8 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
         damagePoints: [],
         abilityDamage: [],
         totalTime: 0
-      }
+      },
+      dataArea: []
     }
 
     this.recalc = this.recalc.bind(this)
@@ -87,8 +89,7 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
     })
 
     dataPie.totalTime += simData.totalTime
-
-    this.setState({ data: data, dataAvg: dataAvg, dataPie: dataPie }, () => {
+    this.setState({ data: data, dataAvg: dataAvg, dataPie: dataPie, dataArea: sim.createDataPointsAreaChart().damagePoints }, () => {
       this.updateLine()
       this.updatePie()
     })
@@ -134,7 +135,10 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
         <CardContent>
           <Grid container xs={12} spacing={2}>
             <Grid item sm xs={12}><DamageChart data={this.state.data} dataAvg={this.smoothData(this.smoothData(this.state.dataAvg, this.state.pass1), this.state.pass2)} /></Grid>
-            {this.state.dataPie && (<Grid item sm={4} xs={12}><DamagePieChart data={this.state.dataPie.abilityDamage} time={this.state.dataPie.totalTime} /></Grid>)}
+            {false && <Grid item sm={4} xs={12}><DamagePieChart data={this.state.dataPie.abilityDamage} time={this.state.dataPie.totalTime} /></Grid>}
+          </Grid>
+          <Grid container xs={12} spacing={2}>
+            <Grid item sm xs={12}><DamageAreaChart data={this.state.dataArea} /></Grid>
           </Grid>
         </CardContent>
         <CardActions>

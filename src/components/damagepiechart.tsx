@@ -8,7 +8,6 @@ class DamagePieChart extends Component<any, { options: {}, series: any }> {
 
         super(props);
 
-
         let values: { data: Array<number>, labels: Array<string> } = { data: [], labels: [] }
         data.sort((a, b) => b.damage - a.damage).forEach((value: AbilityDamage) => {
             values.data.push(Math.round(value.damage / time))
@@ -47,7 +46,7 @@ class DamagePieChart extends Component<any, { options: {}, series: any }> {
     }
     render() {
         return (
-            <ReactApexChart options={this.state.options} series={this.state.series} type="pie" height={320} />
+            <ReactApexChart options={this.state.options} series={this.state.series} type="pie" height={300} />
         )
     }
 }

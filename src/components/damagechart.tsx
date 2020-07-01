@@ -45,7 +45,7 @@ class DamageChart extends Component<any, { options: {}, series: any }> {
     }
     render() {
         return (
-            <ReactApexChart options={this.state.options} series={this.state.series} type="line" height={320} />
+            <ReactApexChart options={this.state.options} series={this.state.series} type="line" height={300} />
         )
     }
 }
