@@ -14,6 +14,21 @@ class DamageAreaChart extends Component<any, { series: any[], options: {} }> {
             options: {
                 chart: {
                     id: 'dncDemoArea',
+                    toolbar: {
+                        show: true,
+                        offsetX: 0,
+                        offsetY: 0,
+                        tools: {
+                            download: false,
+                            selection: true,
+                            zoom: true,
+                            zoomin: false,
+                            zoomout: false,
+                            pan: false,
+                            reset: true
+                        },
+                        autoSelected: 'zoom'
+                    },
                     type: 'area',
                     height: 350,
                     stacked: true
@@ -32,6 +47,9 @@ class DamageAreaChart extends Component<any, { series: any[], options: {} }> {
                 xaxis: {
                     type: 'numeric'
                 },
+                tooltip: {
+                    inverseOrder: true,
+                }
             },
         };
     }

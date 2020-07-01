@@ -6,7 +6,7 @@ import { dancerBIS } from '../../consts';
 import levelMod80 from '../../sim/consts/levelmod';
 import { dancerSkills } from '../../sim/jobs/dnc/dancer';
 import DNCSim from '../../sim/jobs/dnc/sim';
-import SimData from '../../sim/jobs/simdata';
+import SimData, { SimDataArea } from '../../sim/jobs/simdata';
 import Skill from '../../sim/jobs/skill';
 import movingAvg from '../../sim/util/movingaverage';
 import DamageChart from '../damagechart';
@@ -14,7 +14,7 @@ import DamagePieChart from '../damagepiechart';
 import DamageAreaChart from '../damageareachart';
 
 
-class DNCDemo extends Component<{}, { pass1: number | string | Array<number | string>, pass2: number | string | Array<number | string>, data: number[][][], dataAvg: number[][], dataPie: SimData, dataArea: Array<{ name: string, damage: Array<number[]> }> }>  {
+class DNCDemo extends Component<{}, { pass1: number | string | Array<number | string>, pass2: number | string | Array<number | string>, data: { name: string, damage: Array<number[]> }[][], dataArea: { name: string, damage: Array<number[]> }[] }>  {
   constructor(props) {
 
     super(props);
@@ -23,12 +23,6 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
       pass1: 5,
       pass2: 15,
       data: [],
-      dataAvg: [],
-      dataPie: {
-        damagePoints: [],
-        abilityDamage: [],
-        totalTime: 0
-      },
       dataArea: []
     }
 
@@ -42,9 +36,7 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
   }
 
   recalc() {
-    let dataAvg = []
-    let data: number[][][] = [...this.state.data]
-    let dataPie: SimData = { ...this.state.dataPie }
+    let data: { name: string, damage: Array<number[]> }[][] = [...this.state.data]
 
     const opener: Array<Skill> = [
       dancerSkills.prePullStandard,
@@ -63,66 +55,35 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
 
     sim.run()
 
-    let simData: SimData = sim.createDataPointsPerSecondNew()
+    let simData: SimDataArea = sim.createDataPointsAreaChart()
 
     data.push(simData.damagePoints)
 
-    let temp: number[] = [0, 0]
+    let dataArea = data.reduce((prev: { name: string, damage: number[][] }[], current: { name: string, damage: number[][] }[]) => {
 
-    for (let i = 0; i < data[0].length; i++) {
-      temp[0] = i
-      for (let j = 0; j < data.length; j++) {
-        temp[1] += data[j][i][1]
-      }
+      current.forEach((cur) => {
+        let found = prev.find((val) => val.name === cur.name)
 
-      dataAvg.push([temp[0], temp[1] / data.length])
-      temp = [0, 0]
-    }
+        if (found) {
+          found.damage.forEach((elem, index) => { elem[1] = elem[1] + cur.damage[index][1] })
+        } else {
+          prev.push(cur)
+        }
 
-    simData.abilityDamage.forEach((val, index) => {
-      let found = dataPie.abilityDamage.find((valFind) => val.name === valFind.name)
-      if (found) {
-        found.damage += val.damage
-      } else {
-        dataPie.abilityDamage.push(val)
-      }
-    })
+      })
+      return prev
+    }, [])
 
-    dataPie.totalTime += simData.totalTime
-    this.setState({ data: data, dataAvg: dataAvg, dataPie: dataPie, dataArea: sim.createDataPointsAreaChart().damagePoints }, () => {
-      this.updateLine()
-      this.updatePie()
+    this.setState({ data: data, dataArea: dataArea }, () => {
+
     })
   }
 
   async reset() {
     this.setState({
-      data: [], dataAvg: [], dataPie: {
-        damagePoints: [],
-        abilityDamage: [],
-        totalTime: 0
-      }
+      data: [],
+      dataArea: []
     }, this.recalc)
-  }
-
-  updateLine() {
-    ApexCharts.exec('dncDemoLine', 'updateSeries', [{
-      data: this.smoothData(this.smoothData(this.state.dataAvg, this.state.pass1), this.state.pass2)
-    }])
-  }
-
-  updatePie() {
-    let name: string[] = []
-    let damage: number[] = []
-    this.state.dataPie.abilityDamage.sort((a, b) => b.damage - a.damage).forEach((abilityDamage) => {
-      name.push(abilityDamage.name)
-      damage.push(abilityDamage.damage)
-    })
-    damage.forEach((val, index) => damage[index] = Math.round(damage[index] / this.state.dataPie.totalTime))
-    ApexCharts.exec('dncDemoPie', 'updateSeries', [...damage])
-    ApexCharts.exec('dncDemoPie', 'updateOptions', {
-      labels: [...name]
-    })
   }
 
   smoothData(dataAvg, amount) {
@@ -134,10 +95,6 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
       <Card>
         <CardContent>
           <Grid container xs={12} spacing={2}>
-            <Grid item sm xs={12}><DamageChart data={this.state.data} dataAvg={this.smoothData(this.smoothData(this.state.dataAvg, this.state.pass1), this.state.pass2)} /></Grid>
-            {false && <Grid item sm={4} xs={12}><DamagePieChart data={this.state.dataPie.abilityDamage} time={this.state.dataPie.totalTime} /></Grid>}
-          </Grid>
-          <Grid container xs={12} spacing={2}>
             <Grid item sm xs={12}><DamageAreaChart data={this.state.dataArea} /></Grid>
           </Grid>
         </CardContent>
@@ -147,7 +104,7 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
             <Button variant="outlined" onClick={this.reset} startIcon={<Delete />}>Reset</Button>
           </ButtonGroup>
         </CardActions>
-        <CardActions>
+        {/*(false && <CardActions>
           <Grid container spacing={2}>
             <Grid container item spacing={2}>
               <Grid item>
@@ -190,8 +147,7 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
               </Grid>
             </Grid>
           </Grid>
-        </CardActions >
-        <Divider />
+                </CardActions >)*/}
       </Card >
     )
   }
