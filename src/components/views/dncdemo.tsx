@@ -5,13 +5,13 @@ import { dancerBIS } from '../../consts';
 import levelMod80 from '../../sim/consts/levelmod';
 import { dancerSkills } from '../../sim/jobs/dnc/dancer';
 import DNCSim from '../../sim/jobs/dnc/sim';
-import { SimDataArea } from '../../sim/jobs/simdata';
+import { SimDataArea, DamagePoint } from '../../sim/jobs/simdata';
 import Skill from '../../sim/jobs/skill';
 import DamageAreaChart from '../damageareachart';
 import DamageTable from '../damagetable';
 
 
-class DNCDemo extends Component<{}, { pass1: number | string | Array<number | string>, pass2: number | string | Array<number | string>, data: { name: string, totalDamage: number, damage: Array<number[]> }[][], dataArea: { name: string, damage: Array<number[]> }[] }>  {
+class DNCDemo extends Component<{}, { pass1: number | string | Array<number | string>, pass2: number | string | Array<number | string>, totalTime: number, data: DamagePoint[][], dataArea: { name: string, damage: Array<number[]> }[] }>  {
   constructor(props) {
 
     super(props);
@@ -19,6 +19,7 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
     this.state = {
       pass1: 5,
       pass2: 15,
+      totalTime: 0,
       data: [],
       dataArea: []
     }
@@ -33,7 +34,8 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
   }
 
   recalc() {
-    let data: { name: string, totalDamage, damage: Array<number[]> }[][] = [...this.state.data]
+    let data: DamagePoint[][] = [...this.state.data]
+    let totalTime: number = this.state.totalTime
 
     const opener: Array<Skill> = [
       dancerSkills.prePullStandard,
@@ -56,6 +58,8 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
 
     data.push(simData.damagePoints)
 
+    totalTime = totalTime + simData.totalTime
+
     let dataArea = data.reduce((prev: { name: string, damage: number[][] }[], current: { name: string, damage: number[][] }[]) => {
 
       current.forEach((cur) => {
@@ -77,7 +81,7 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
       })
     })
 
-    this.setState({ data: data, dataArea: dataArea })
+    this.setState({ data: data, totalTime: totalTime, dataArea: dataArea })
   }
 
   async reset() {
@@ -89,6 +93,7 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
     })
 
     this.setState({
+      totalTime: 0,
       data: [],
       dataArea: dataArea
     }, this.recalc)
@@ -110,7 +115,7 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
             </CardActions>
           </Grid>
           <Grid container spacing={2}>
-            <Grid item sm xs={12}><DamageTable data={this.state.data} /></Grid>
+            <Grid item sm xs={12}><DamageTable data={this.state.data} totalTime={this.state.totalTime} /></Grid>
           </Grid>
         </CardContent>
         {/*(false && <CardActions>

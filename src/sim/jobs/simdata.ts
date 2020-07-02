@@ -11,9 +11,19 @@ export default interface SimData {
     totalTime: number
 }
 
+export interface DamagePoint {
+    name: string
+    totalDamage: number
+    damage: number[][]
+    crit: number
+    dhit: number
+    critdhit: number
+    hits: number
+}
+
 export interface SimDataArea {
     //An array of [time (second), damage]
-    damagePoints: Array<{ name: string, totalDamage: number, damage: Array<number[]> }>
+    damagePoints: DamagePoint[]
     abilityDamage: Array<AbilityDamage>
 
     totalTime: number

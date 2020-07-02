@@ -74,6 +74,7 @@ class DamageAreaChart extends Component<any, { series: any[], options: {} }> {
     }
 
     componentDidUpdate(oldProps) {
+        
         if (oldProps.data !== this.props.data)
             this.setState({ series: this.dataToSeries(this.props.data) })
     }
