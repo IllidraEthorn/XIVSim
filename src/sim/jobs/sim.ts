@@ -329,8 +329,8 @@ export default abstract class Sim {
     }
 
     createDataPointsAreaChart(): SimDataArea {
-        let damagePoints: Array<{ name: string, damage: Array<number[]> }> = []
-        let found: { name: string, damage: Array<number[]> }
+        let damagePoints: Array<{ name: string, totalDamage: number, damage: Array<number[]> }> = []
+        let found: { name: string, totalDamage: number, damage: Array<number[]> }
 
 
         let abilityDamage: Array<AbilityDamage> = []
@@ -343,7 +343,7 @@ export default abstract class Sim {
                 found = damagePoints.find((val) => val.name === damageLog.name)
                 if (!found) {
                     tempArr = new Array<number[]>(Math.ceil(this.log[this.log.length - 1].timestamp / 100) + 1).fill([0, 0]).map((val, index) => [index, 0])
-                    damagePoints.push({ name: damageLog.name, damage: tempArr })
+                    damagePoints.push({ name: damageLog.name, totalDamage: 0, damage: tempArr })
                     found = damagePoints.find((val) => val.name === damageLog.name)
                     found.damage.forEach((val, index) => {
                         found.damage[index][0] = index
@@ -351,7 +351,7 @@ export default abstract class Sim {
 
                 }
                 found.damage.find((val) => Math.ceil(damageLog.timestamp / 100) === val[0])[1] += damageLog.damage
-
+                found.totalDamage += damageLog.damage
             }
 
 

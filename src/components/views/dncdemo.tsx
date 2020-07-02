@@ -1,20 +1,17 @@
-import { Button, ButtonGroup, Card, CardActions, CardContent, Divider, Grid, Slider, Typography } from '@material-ui/core';
+import { Button, ButtonGroup, Card, CardActions, CardContent, Grid } from '@material-ui/core';
 import { Add, Delete } from '@material-ui/icons';
-import ApexCharts from 'apexcharts';
 import React, { Component } from 'react';
 import { dancerBIS } from '../../consts';
 import levelMod80 from '../../sim/consts/levelmod';
 import { dancerSkills } from '../../sim/jobs/dnc/dancer';
 import DNCSim from '../../sim/jobs/dnc/sim';
-import SimData, { SimDataArea } from '../../sim/jobs/simdata';
+import { SimDataArea } from '../../sim/jobs/simdata';
 import Skill from '../../sim/jobs/skill';
-import movingAvg from '../../sim/util/movingaverage';
-import DamageChart from '../damagechart';
-import DamagePieChart from '../damagepiechart';
 import DamageAreaChart from '../damageareachart';
+import DamageTable from '../damagetable';
 
 
-class DNCDemo extends Component<{}, { pass1: number | string | Array<number | string>, pass2: number | string | Array<number | string>, data: { name: string, damage: Array<number[]> }[][], dataArea: { name: string, damage: Array<number[]> }[] }>  {
+class DNCDemo extends Component<{}, { pass1: number | string | Array<number | string>, pass2: number | string | Array<number | string>, data: { name: string, totalDamage: number, damage: Array<number[]> }[][], dataArea: { name: string, damage: Array<number[]> }[] }>  {
   constructor(props) {
 
     super(props);
@@ -36,7 +33,7 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
   }
 
   recalc() {
-    let data: { name: string, damage: Array<number[]> }[][] = [...this.state.data]
+    let data: { name: string, totalDamage, damage: Array<number[]> }[][] = [...this.state.data]
 
     const opener: Array<Skill> = [
       dancerSkills.prePullStandard,
@@ -91,8 +88,6 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
       })
     })
 
-    console.log(dataArea)
-
     this.setState({
       data: [],
       dataArea: dataArea
@@ -103,16 +98,21 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
     return (
       <Card>
         <CardContent>
-          <Grid container xs={12} spacing={2}>
+          <Grid container spacing={2}>
             <Grid item sm xs={12}><DamageAreaChart data={this.state.dataArea} /></Grid>
           </Grid>
+          <Grid container spacing={2}>
+            <CardActions>
+              <ButtonGroup>
+                <Button variant="outlined" onClick={this.recalc} startIcon={<Add />}>Add</Button>
+                <Button variant="outlined" onClick={this.reset} startIcon={<Delete />}>Reset</Button>
+              </ButtonGroup>
+            </CardActions>
+          </Grid>
+          <Grid container spacing={2}>
+            <Grid item sm xs={12}><DamageTable data={this.state.data} /></Grid>
+          </Grid>
         </CardContent>
-        <CardActions>
-          <ButtonGroup>
-            <Button variant="outlined" onClick={this.recalc} startIcon={<Add />}>Add</Button>
-            <Button variant="outlined" onClick={this.reset} startIcon={<Delete />}>Reset</Button>
-          </ButtonGroup>
-        </CardActions>
         {/*(false && <CardActions>
           <Grid container spacing={2}>
             <Grid container item spacing={2}>

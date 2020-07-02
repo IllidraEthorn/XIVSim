@@ -200,7 +200,7 @@ export default class DNCSim extends Sim {
         if (this.getGCDProcToUse()) {
             return this.getGCDProcToUse()
         }
-        if (this.comboAction == dancerSkills.cascade) {
+        if (this.comboAction === dancerSkills.cascade) {
             return dancerSkills.fountain
         }
         return dancerSkills.cascade

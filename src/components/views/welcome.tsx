@@ -5,7 +5,6 @@ import CardContent from '@material-ui/core/CardContent';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import React from 'react';
-import DamageChart from '../damagechart';
 
 const useStyles = makeStyles({
   root: {
