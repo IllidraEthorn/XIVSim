@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "ce389bbe8069df4843f0605e3a5dd03a",
+    "revision": "3d119d4c2bfa4577c2324382a0a6fd58",
     "url": "/XIVSim/index.html"
   },
   {
-    "revision": "709343b652b62e8d31dc",
+    "revision": "5f3ecb815167f4ed3f21",
     "url": "/XIVSim/static/css/main.523f09c5.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/XIVSim/static/js/2.8d416d98.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "709343b652b62e8d31dc",
-    "url": "/XIVSim/static/js/main.8f1feefd.chunk.js"
+    "revision": "5f3ecb815167f4ed3f21",
+    "url": "/XIVSim/static/js/main.845fe1da.chunk.js"
   },
   {
     "revision": "26beeb349bf58d05db97",
