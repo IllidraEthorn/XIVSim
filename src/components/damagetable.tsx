@@ -56,6 +56,7 @@ export default function DamageTable(props: { data: DamagePoint[][], totalTime: n
           found.crit = found.crit + inst.crit
           found.dhit = found.dhit + inst.dhit
           found.critdhit = found.crit + inst.critdhit
+          found.amount = found.amount + inst.hits
         } else {
           newData.push({ name: inst.name, damage: inst.totalDamage, crit: inst.crit, dhit: inst.dhit, critdhit: inst.critdhit, amount: inst.hits, damagePercent: 0, dps: 0 })
           found = newData.find((f) => f.name === inst.name)
@@ -71,6 +72,7 @@ export default function DamageTable(props: { data: DamagePoint[][], totalTime: n
       val.crit = val.crit / props.data.length
       val.dhit = val.dhit / props.data.length
       val.critdhit = val.critdhit / props.data.length
+      val.amount = val.amount / props.data.length
     })
 
     console.log(props.data)
@@ -99,8 +101,8 @@ export default function DamageTable(props: { data: DamagePoint[][], totalTime: n
             <TableRow key={row.name}>
               <TableCell>{row.name}</TableCell>
               <TableCell align="right">{(row.damagePercent * 100).toFixed(2)}%</TableCell>
-              <TableCell align="right">{row.damage.toFixed(2)}</TableCell>
-              <TableCell align="right">{row.amount}</TableCell>
+              <TableCell align="right">{row.damage.toFixed(0)}</TableCell>
+              <TableCell align="right">{row.amount.toFixed(1)}</TableCell>
               <TableCell align="right">{(row.crit * 100 / row.amount).toFixed(1)}%</TableCell>
               <TableCell align="right">{(row.dhit * 100 / row.amount).toFixed(1)}%</TableCell>
               <TableCell align="right">{(row.critdhit * 100 / row.amount).toFixed(1)}%</TableCell>
