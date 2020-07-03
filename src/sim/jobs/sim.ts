@@ -6,8 +6,8 @@ import Buff from "./buff";
 import CommentLog from "./commentlog";
 import Cooldown from "./cooldown";
 import DamageLog from "./damagelog";
+import { AbilityDamage, DamagePoint, SimDataArea, Summary } from "./simdata";
 import Skill from "./skill";
-import SimData, { AbilityDamage, SimDataArea, DamagePoint } from "./simdata";
 
 export default abstract class Sim {
     player: Player;
@@ -69,10 +69,10 @@ export default abstract class Sim {
         this.buffsJumpBy(time)
     }
 
-    summary(): any {
+    summary(): Summary {
         return {
             totalDamage: this.damageDealt,
-            dps: (this.damageDealt * 100 / this.currentTime).toFixed(2),
+            dps: (this.damageDealt * 100 / this.currentTime),
             duration: this.currentTime / 100,
             totalActions: this.log.length
         }
@@ -274,60 +274,6 @@ export default abstract class Sim {
         return 0
     }
 
-    createDataPoints(): { damagePoints: Array<number[]> } {
-        let newArr: number[][] = [[0, 0]]
-        this.log.forEach((damageLog) => {
-            if (damageLog.damage === 0) {
-                return
-            }
-            if (damageLog.timestamp / 100 === newArr[newArr.length - 1][0]) {
-                newArr[newArr.length - 1][1] = newArr[newArr.length - 1][1] + damageLog.damage
-            }
-            else {
-                newArr.push([damageLog.timestamp / 100, damageLog.damage])
-            }
-        })
-        return { damagePoints: newArr }
-    }
-
-    createDataPointsPerSecond(): { damagePoints: Array<number[]> } {
-        let newArr: number[][] = [[0, 0]]
-        this.log.forEach((damageLog) => {
-            if (damageLog.damage === 0) {
-                return
-            }
-            if (Math.floor(damageLog.timestamp / 100) === newArr[newArr.length - 1][0]) {
-                newArr[newArr.length - 1][1] = newArr[newArr.length - 1][1] + damageLog.damage
-            }
-            else {
-                newArr.push([Math.floor(damageLog.timestamp / 100), damageLog.damage])
-            }
-        })
-        return { damagePoints: newArr }
-    }
-
-    createDataPointsPerSecondNew(): SimData {
-        let newArr: number[][] = []
-        let abilityDamage: Array<AbilityDamage> = []
-        let ability: AbilityDamage
-        for (let i = 0; i < Math.ceil(this.log[this.log.length - 1].timestamp / 100) + 1; i++) {
-            newArr.push([i, 0])
-        }
-        this.log.forEach((damageLog) => {
-            newArr[Math.ceil(damageLog.timestamp / 100)][1] = newArr[Math.ceil(damageLog.timestamp / 100)][1] + damageLog.damage
-
-            if (damageLog.damage > 0) {
-                ability = abilityDamage.find((val) => val.name === damageLog.name)
-                if (ability) {
-                    ability.damage += damageLog.damage
-                } else {
-                    abilityDamage.push({ name: damageLog.name, damage: damageLog.damage })
-                }
-            }
-        })
-        return { damagePoints: newArr, abilityDamage: abilityDamage, totalTime: this.currentTime / 100 }
-    }
-
     createDataPointsAreaChart(): SimDataArea {
         let damagePoints: DamagePoint[] = []
         let found: DamagePoint
@@ -374,7 +320,11 @@ export default abstract class Sim {
                 }
             }
         })
-        return { damagePoints: damagePoints, abilityDamage: abilityDamage, totalTime: this.currentTime / 100 }
+        return { damagePoints: damagePoints, abilityDamage: abilityDamage, log: { logs: this.getLog(), summary: this.summary() }, totalTime: this.currentTime / 100 }
+    }
+
+    getLog(): DamageLog[] {
+        return this.log
     }
 
     abstract printDamageLogLine(damageLog: DamageLog): void;

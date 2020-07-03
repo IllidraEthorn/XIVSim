@@ -75,8 +75,6 @@ export default function DamageTable(props: { data: DamagePoint[][], totalTime: n
       val.amount = val.amount / props.data.length
     })
 
-    console.log(props.data)
-
     setData(newData.sort((a, b) => b.damage - a.damage))
     setTotalDPS(totalDPS)
   }, [props.data])

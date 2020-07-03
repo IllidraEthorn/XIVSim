@@ -1,3 +1,5 @@
+import DamageLog from "./damagelog";
+
 export interface AbilityDamage {
     name: string
     damage: number
@@ -25,6 +27,14 @@ export interface SimDataArea {
     //An array of [time (second), damage]
     damagePoints: DamagePoint[]
     abilityDamage: Array<AbilityDamage>
+    log: { logs: DamageLog[], summary: Summary }
 
     totalTime: number
+}
+
+export interface Summary {
+    totalDamage: number
+    dps: number
+    duration: number
+    totalActions: number
 }

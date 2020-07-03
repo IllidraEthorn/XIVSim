@@ -3,15 +3,16 @@ import { Add, Delete } from '@material-ui/icons';
 import React, { Component } from 'react';
 import { dancerBIS } from '../../consts';
 import levelMod80 from '../../sim/consts/levelmod';
+import DamageLog from '../../sim/jobs/damagelog';
 import { dancerSkills } from '../../sim/jobs/dnc/dancer';
 import DNCSim from '../../sim/jobs/dnc/sim';
-import { SimDataArea, DamagePoint } from '../../sim/jobs/simdata';
+import { DamagePoint, SimDataArea, Summary } from '../../sim/jobs/simdata';
 import Skill from '../../sim/jobs/skill';
 import DamageAreaChart from '../damageareachart';
 import DamageTable from '../damagetable';
 
 
-class DNCDemo extends Component<{}, { pass1: number | string | Array<number | string>, pass2: number | string | Array<number | string>, totalTime: number, data: DamagePoint[][], dataArea: { name: string, damage: Array<number[]> }[] }>  {
+class DNCDemo extends Component<{}, { pass1: number | string | Array<number | string>, pass2: number | string | Array<number | string>, totalTime: number, logs: Array<{ logs: DamageLog[], summary: Summary }>, data: DamagePoint[][], dataArea: { name: string, damage: Array<number[]> }[] }>  {
   constructor(props) {
 
     super(props);
@@ -20,6 +21,7 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
       pass1: 5,
       pass2: 15,
       totalTime: 0,
+      logs: [],
       data: [],
       dataArea: []
     }
@@ -35,6 +37,7 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
 
   recalc() {
     let data: DamagePoint[][] = [...this.state.data]
+    let logs: { logs: DamageLog[], summary: Summary }[] = [...this.state.logs]
     let totalTime: number = this.state.totalTime
 
     const opener: Array<Skill> = [
@@ -56,7 +59,11 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
 
     let simData: SimDataArea = sim.createDataPointsAreaChart()
 
+    logs.push(simData.log)
+
     data.push(simData.damagePoints)
+
+    //console.log(logs)
 
     totalTime = totalTime + simData.totalTime
 
@@ -81,7 +88,7 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
       })
     })
 
-    this.setState({ data: data, totalTime: totalTime, dataArea: dataArea })
+    this.setState({ data: data, totalTime: totalTime, logs: logs, dataArea: dataArea })
   }
 
   async reset() {
@@ -94,6 +101,7 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
 
     this.setState({
       totalTime: 0,
+      logs: [],
       data: [],
       dataArea: dataArea
     }, this.recalc)
@@ -115,53 +123,9 @@ class DNCDemo extends Component<{}, { pass1: number | string | Array<number | st
             </CardActions>
           </Grid>
           <Grid container spacing={2}>
-            <Grid item sm xs={12}><DamageTable data={this.state.data} totalTime={this.state.totalTime} /></Grid>
+            <Grid item xs><DamageTable data={this.state.data} totalTime={this.state.totalTime} /></Grid>
           </Grid>
         </CardContent>
-        {/*(false && <CardActions>
-          <Grid container spacing={2}>
-            <Grid container item spacing={2}>
-              <Grid item>
-                <Typography>Smoothness Pass 1:</Typography>
-              </Grid>
-              <Grid item xs={true}>
-                <Slider
-                  min={0}
-                  max={100}
-                  defaultValue={30}
-                  value={typeof this.state.pass1 === 'number' ? this.state.pass1 : 0}
-                  aria-labelledby="discrete-slider-custom"
-                  step={1}
-                  valueLabelDisplay="auto"
-                  onChange={(event: any, newValue: number | number[]) => {
-                    this.setState({ pass1: newValue })
-                    this.updateLine();
-                  }}
-                />
-              </Grid>
-            </Grid>
-            <Grid container item spacing={2}>
-              <Grid item>
-                <Typography>Smoothness Pass 2:</Typography>
-              </Grid>
-              <Grid item xs={true}>
-                <Slider
-                  min={0}
-                  max={100}
-                  defaultValue={30}
-                  value={typeof this.state.pass2 === 'number' ? this.state.pass2 : 0}
-                  aria-labelledby="discrete-slider-custom"
-                  step={1}
-                  valueLabelDisplay="auto"
-                  onChange={(event: any, newValue: number | number[]) => {
-                    this.setState({ pass2: newValue })
-                    this.updateLine();
-                  }}
-                />
-              </Grid>
-            </Grid>
-          </Grid>
-                </CardActions >)*/}
       </Card >
     )
   }
