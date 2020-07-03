@@ -27,11 +27,6 @@ interface Row {
   dps: number
 }
 
-
-function createData(name: string, damagePercent: number, damage: number, dps: number) {
-  return { name, damage, damagePercent, dps };
-}
-
 export default function DamageTable(props: { data: DamagePoint[][], totalTime: number }) {
 
   const classes = useStyles();
