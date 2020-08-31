@@ -296,11 +296,13 @@ export default abstract class Sim {
                     })
 
                 }
-                if (damageLog.crit && !damageLog.directHit) {
+                if (damageLog.crit) {
                     found.crit++
-                } else if (!damageLog.crit && damageLog.directHit) {
+                }
+                if (damageLog.directHit) {
                     found.dhit++
-                } else if (damageLog.crit && damageLog.directHit) {
+                }
+                if (damageLog.crit && damageLog.directHit) {
                     found.critdhit++
                 }
 

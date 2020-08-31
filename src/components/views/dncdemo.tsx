@@ -2,18 +2,21 @@ import { Button, ButtonGroup, Card, CardActions, CardContent, Grid, Menu, MenuIt
 import { Add, Delete } from '@material-ui/icons';
 import React, { Component } from 'react';
 import { dancerBIS } from '../../consts';
+import { ConfigOption } from '../../interfaces/configoption';
 import levelMod80 from '../../sim/consts/levelmod';
 import DamageLog from '../../sim/jobs/damagelog';
 import { dancerSkills } from '../../sim/jobs/dnc/dancer';
 import DNCSim from '../../sim/jobs/dnc/sim';
+import { jobMods } from '../../sim/jobs/jobmods';
 import { DamagePoint, SimDataArea, Summary } from '../../sim/jobs/simdata';
 import Skill from '../../sim/jobs/skill';
+import { Player } from '../../sim/player/player';
+import Config from '../config';
 import DamageAreaChart from '../damageareachart';
 import DamageTable from '../damagetable';
 import LogViewer from '../logviewer';
 
-
-class DNCDemo extends Component<{}, { tabAnchor: null | HTMLElement, tab: number, pass1: number | string | Array<number | string>, pass2: number | string | Array<number | string>, totalTime: number, selectedLog: number, logs: Array<{ logs: DamageLog[], summary: Summary }>, data: DamagePoint[][], dataArea: { name: string, damage: Array<number[]> }[] }>  {
+class DNCDemo extends Component<{}, { tabAnchor: null | HTMLElement, tab: number, pass1: number | string | Array<number | string>, pass2: number | string | Array<number | string>, totalTime: number, selectedLog: number, logs: Array<{ logs: DamageLog[], summary: Summary }>, data: DamagePoint[][], dataArea: { name: string, damage: Array<number[]> }[], config: ConfigOption[] }>  {
   constructor(props) {
 
     super(props);
@@ -27,7 +30,8 @@ class DNCDemo extends Component<{}, { tabAnchor: null | HTMLElement, tab: number
       selectedLog: 0,
       logs: [],
       data: [],
-      dataArea: []
+      dataArea: [],
+      config: Object.keys(dancerBIS.stats).map((key, index) => { return { name: key, type: "number", value: dancerBIS.stats[key] } })
     }
 
     this.recalc = this.recalc.bind(this)
@@ -57,7 +61,21 @@ class DNCDemo extends Component<{}, { tabAnchor: null | HTMLElement, tab: number
       dancerSkills.devilment
     ]
 
-    let sim: DNCSim = new DNCSim(dancerBIS, levelMod80, 400, opener)
+    const configToPlayer = (): Player => {
+      let toReturn: Player = JSON.parse(JSON.stringify(dancerBIS))
+
+      console.log("OUT", toReturn)
+
+      toReturn.jobMod = jobMods.dancer
+
+      this.state.config.forEach((value) => {
+        toReturn.stats[value.name] = value.value
+      })
+
+      return toReturn
+    }
+
+    let sim: DNCSim = new DNCSim(configToPlayer(), levelMod80, 400, opener)
 
     sim.run()
 
@@ -133,7 +151,7 @@ class DNCDemo extends Component<{}, { tabAnchor: null | HTMLElement, tab: number
               <Tabs value={this.state.tab} onChange={(e, newValue) => { if (newValue !== 1) this.setState({ tab: newValue }) }} aria-label="simple tabs example">
                 <Tab label="Average Damage" id='tab-1' />
                 <Tab onClick={(event: React.MouseEvent<HTMLButtonElement>) => { this.setState({ tabAnchor: event.currentTarget }) }} label="View Log" id='tab-2' />
-                <Tab disabled label="Configuration" id='tab-3' />
+                <Tab label="Configuration" id='tab-3' />
               </Tabs>
               <Menu
                 id="simple-menu"
@@ -152,7 +170,7 @@ class DNCDemo extends Component<{}, { tabAnchor: null | HTMLElement, tab: number
             <Grid item xs={12}>
               <TabPanel value={this.state.tab} index={0}><DamageTable data={this.state.data} totalTime={this.state.totalTime} /></TabPanel>
               <TabPanel value={this.state.tab} index={1}><LogViewer selection={this.state.selectedLog} logs={this.state.logs} /></TabPanel>
-              <TabPanel value={this.state.tab} index={2}>Configuration here</TabPanel>
+              <TabPanel value={this.state.tab} index={2}><Config config={this.state.config} /></TabPanel>
             </Grid>
 
           </Grid>
