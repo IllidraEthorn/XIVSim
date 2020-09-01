@@ -8,6 +8,8 @@ export default interface Skill {
     traitDamageMult: number
     cooldown?: number
 
+    iconPath?: string
+
     //Does this skill trigger the gcd?
     isGCD: boolean
     //Combo Stuff

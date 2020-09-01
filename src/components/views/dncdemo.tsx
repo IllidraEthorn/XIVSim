@@ -16,7 +16,7 @@ import DamageAreaChart from '../damageareachart';
 import DamageTable from '../damagetable';
 import LogViewer from '../logviewer';
 
-class DNCDemo extends Component<{}, { tabAnchor: null | HTMLElement, tab: number, pass1: number | string | Array<number | string>, pass2: number | string | Array<number | string>, totalTime: number, selectedLog: number, logs: Array<{ logs: DamageLog[], summary: Summary }>, data: DamagePoint[][], dataArea: { name: string, damage: Array<number[]> }[], config: ConfigOption[] }>  {
+class DNCDemo extends Component<{}, { tabAnchor: null | HTMLElement, tab: number, pass1: number | string | Array<number | string>, pass2: number | string | Array<number | string>, totalTime: number, selectedLog: number, logs: Array<{ logs: DamageLog[], summary: Summary }>, data: DamagePoint[][], dataArea: { name: string, damage: Array<number[]> }[], config: ConfigOption[], opener: Skill[] }>  {
   constructor(props) {
 
     super(props);
@@ -31,7 +31,8 @@ class DNCDemo extends Component<{}, { tabAnchor: null | HTMLElement, tab: number
       logs: [],
       data: [],
       dataArea: [],
-      config: Object.keys(dancerBIS.stats).map((key, index) => { return { name: key, type: "number", value: dancerBIS.stats[key] } })
+      config: Object.keys(dancerBIS.stats).map((key, index) => { return { name: key, type: "number", value: dancerBIS.stats[key] } }),
+      opener: [dancerSkills.prePullStandard, dancerSkills.technicalStep, dancerSkills.step, dancerSkills.step, dancerSkills.step, dancerSkills.step, dancerSkills.technicalFinish, dancerSkills.flourish, dancerSkills.risingWindmill, dancerSkills.devilment]
     }
 
     this.recalc = this.recalc.bind(this)
@@ -44,22 +45,10 @@ class DNCDemo extends Component<{}, { tabAnchor: null | HTMLElement, tab: number
   }
 
   recalc() {
+    console.log("state", this.state)
     let data: DamagePoint[][] = [...this.state.data]
     let logs: { logs: DamageLog[], summary: Summary }[] = [...this.state.logs]
     let totalTime: number = this.state.totalTime
-
-    const opener: Array<Skill> = [
-      dancerSkills.prePullStandard,
-      dancerSkills.technicalStep,
-      dancerSkills.step,
-      dancerSkills.step,
-      dancerSkills.step,
-      dancerSkills.step,
-      dancerSkills.technicalFinish,
-      dancerSkills.flourish,
-      dancerSkills.risingWindmill,
-      dancerSkills.devilment
-    ]
 
     const configToPlayer = (): Player => {
       let toReturn: Player = JSON.parse(JSON.stringify(dancerBIS))
@@ -75,7 +64,9 @@ class DNCDemo extends Component<{}, { tabAnchor: null | HTMLElement, tab: number
       return toReturn
     }
 
-    let sim: DNCSim = new DNCSim(configToPlayer(), levelMod80, 400, opener)
+    console.log(this.state.opener)
+
+    let sim: DNCSim = new DNCSim(configToPlayer(), levelMod80, 400, JSON.parse(JSON.stringify(this.state.opener)))
 
     sim.run()
 
@@ -170,7 +161,7 @@ class DNCDemo extends Component<{}, { tabAnchor: null | HTMLElement, tab: number
             <Grid item xs={12}>
               <TabPanel value={this.state.tab} index={0}><DamageTable data={this.state.data} totalTime={this.state.totalTime} /></TabPanel>
               <TabPanel value={this.state.tab} index={1}><LogViewer selection={this.state.selectedLog} logs={this.state.logs} /></TabPanel>
-              <TabPanel value={this.state.tab} index={2}><Config config={this.state.config} /></TabPanel>
+              <TabPanel value={this.state.tab} index={2}><Config config={this.state.config} opener={this.state.opener} /></TabPanel>
             </Grid>
 
           </Grid>

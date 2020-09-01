@@ -106,6 +106,7 @@ const fountainFall: Skill = {
 
 const risingWindmill: Skill = {
     name: "Rising Windmill",
+    iconPath: "https://xivapi.com/i/003000/003463.png",
     baseCastTime: 0,
     baseRecastTime: 2.5,
     potency: 300,
@@ -136,6 +137,7 @@ const saberDance: Skill = {
 
 const flourish: Skill = {
     name: "Flourish",
+    iconPath: "https://xivapi.com/i/003000/003475.png",
     baseCastTime: 0,
     baseRecastTime: 60,
     cooldown: 60,
@@ -146,6 +148,7 @@ const flourish: Skill = {
 
 const standardStep: Skill = {
     name: "Standard Step",
+    iconPath: "https://xivapi.com/i/003000/003454.png",
     baseCastTime: 0,
     baseRecastTime: 1.5,
     cooldown: 30,
@@ -156,6 +159,7 @@ const standardStep: Skill = {
 
 const prePullStandard: Skill = {
     name: "Standard Finish",
+    iconPath: "https://xivapi.com/i/003000/003459.png",
     baseCastTime: 0,
     baseRecastTime: 1.5,
     potency: 1000,
@@ -166,6 +170,7 @@ const prePullStandard: Skill = {
 
 const technicalStep: Skill = {
     name: "Technical Step",
+    iconPath: "https://xivapi.com/i/003000/003473.png",
     baseCastTime: 0,
     baseRecastTime: 1.5,
     cooldown: 120,
@@ -176,6 +181,7 @@ const technicalStep: Skill = {
 
 const step: Skill = {
     name: "Step",
+    iconPath: "https://xivapi.com/i/003000/003455.png",
     baseCastTime: 0,
     baseRecastTime: 1,
     traitDamageMult: 0,
@@ -185,6 +191,7 @@ const step: Skill = {
 
 const standardFinish: Skill = {
     name: "Standard Finish",
+    iconPath: "https://xivapi.com/i/003000/003459.png",
     baseCastTime: 0,
     baseRecastTime: 1.5,
     potency: 1000,
@@ -195,6 +202,7 @@ const standardFinish: Skill = {
 
 const technicalFinish: Skill = {
     name: "Technical Finish",
+    iconPath: "http://xivapi.com/i/003000/003474.png",
     baseCastTime: 0,
     baseRecastTime: 1.5,
     potency: 1500,
@@ -205,6 +213,7 @@ const technicalFinish: Skill = {
 
 const devilment: Skill = {
     name: "Devilment",
+    iconPath: "https://xivapi.com/i/003000/003471.png",
     baseCastTime: 0,
     baseRecastTime: 120,
     cooldown: 120,
