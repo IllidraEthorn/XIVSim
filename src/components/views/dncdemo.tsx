@@ -44,8 +44,8 @@ class DNCDemo extends Component<{}, { tabAnchor: null | HTMLElement, tab: number
     this.recalc()
   }
 
-  recalc() {
-    console.log("state", this.state)
+  recalc(times: number = 1) {
+    //console.log("state", this.state)
     let data: DamagePoint[][] = [...this.state.data]
     let logs: { logs: DamageLog[], summary: Summary }[] = [...this.state.logs]
     let totalTime: number = this.state.totalTime
@@ -53,7 +53,7 @@ class DNCDemo extends Component<{}, { tabAnchor: null | HTMLElement, tab: number
     const configToPlayer = (): Player => {
       let toReturn: Player = JSON.parse(JSON.stringify(dancerBIS))
 
-      console.log("OUT", toReturn)
+      //console.log("OUT", toReturn)
 
       toReturn.jobMod = jobMods.dancer
 
@@ -66,19 +66,23 @@ class DNCDemo extends Component<{}, { tabAnchor: null | HTMLElement, tab: number
 
     console.log(this.state.opener)
 
-    let sim: DNCSim = new DNCSim(configToPlayer(), levelMod80, 400, [...this.state.opener])
+    for (let i = 0; i < times; i++) {
 
-    sim.run()
+      let sim: DNCSim = new DNCSim(configToPlayer(), levelMod80, 400, [...this.state.opener])
 
-    let simData: SimDataArea = sim.createDataPointsAreaChart()
+      sim.run()
 
-    logs.push(simData.log)
+      let simData: SimDataArea = sim.createDataPointsAreaChart()
 
-    data.push(simData.damagePoints)
+      logs.push(simData.log)
 
-    //console.log(logs)
+      data.push(simData.damagePoints)
 
-    totalTime = totalTime + simData.totalTime
+      //console.log(logs)
+
+      totalTime = totalTime + simData.totalTime
+
+    }
 
     let dataArea = data.reduce((prev: { name: string, damage: number[][] }[], current: { name: string, damage: number[][] }[]) => {
 
@@ -129,7 +133,8 @@ class DNCDemo extends Component<{}, { tabAnchor: null | HTMLElement, tab: number
           <Grid container spacing={2}>
             <CardActions>
               <ButtonGroup>
-                <Button variant="outlined" onClick={this.recalc} startIcon={<Add />}>Add</Button>
+                <Button variant="outlined" onClick={() => this.recalc(1)} startIcon={<Add />}>Add</Button>
+                <Button variant="outlined" onClick={() => this.recalc(100)} startIcon={<Add />}>Add 100</Button>
                 <Button variant="outlined" onClick={this.reset} startIcon={<Delete />}>Reset</Button>
               </ButtonGroup>
             </CardActions>
