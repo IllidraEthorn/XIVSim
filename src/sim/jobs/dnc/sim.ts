@@ -207,6 +207,10 @@ export default class DNCSim extends Sim {
     }
 
     jumpToNextEvent(filter: boolean = false): void {
+        if (this.getCooldown(dancerSkills.technicalStep.name)?.duration < this.gcdTimer + 250) {
+            this.gcdTimer = this.getCooldown(dancerSkills.technicalStep.name).duration
+        }
+
         let toJump: Array<number> = [this.autoAttackTimer, this.gcdTimer, this.teamGCD, this.cooldowns[0]?.duration]
         if (!filter)
             toJump.push(this.animLock)

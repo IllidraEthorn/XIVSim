@@ -61,7 +61,7 @@ const opener: Array<Skill> = [
     dancerSkills.devilment
 ]
 
-let sim: DNCSim = new DNCSim(dancerBIS, levelMod80, 30, opener);
+let sim: DNCSim = new DNCSim(dancerBIS, levelMod80, 150, [...opener]);
 
 sim.run();
 //sim.log.forEach((damageLog) => { sim.printDamageLogLine(damageLog) });
