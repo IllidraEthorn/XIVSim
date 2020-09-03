@@ -1,22 +1,22 @@
 {
   "files": {
     "main.css": "/XIVSim/static/css/main.523f09c5.chunk.css",
-    "main.js": "/XIVSim/static/js/main.c32b2ea3.chunk.js",
-    "main.js.map": "/XIVSim/static/js/main.c32b2ea3.chunk.js.map",
+    "main.js": "/XIVSim/static/js/main.b9b7bad8.chunk.js",
+    "main.js.map": "/XIVSim/static/js/main.b9b7bad8.chunk.js.map",
     "runtime-main.js": "/XIVSim/static/js/runtime-main.44e62228.js",
     "runtime-main.js.map": "/XIVSim/static/js/runtime-main.44e62228.js.map",
-    "static/js/2.ddfc35e6.chunk.js": "/XIVSim/static/js/2.ddfc35e6.chunk.js",
-    "static/js/2.ddfc35e6.chunk.js.map": "/XIVSim/static/js/2.ddfc35e6.chunk.js.map",
+    "static/js/2.ba7311ae.chunk.js": "/XIVSim/static/js/2.ba7311ae.chunk.js",
+    "static/js/2.ba7311ae.chunk.js.map": "/XIVSim/static/js/2.ba7311ae.chunk.js.map",
     "index.html": "/XIVSim/index.html",
-    "precache-manifest.74105cbf0652d87962213c74e253c59d.js": "/XIVSim/precache-manifest.74105cbf0652d87962213c74e253c59d.js",
+    "precache-manifest.15fbda1f7dc711dc8dea8f8f884d547d.js": "/XIVSim/precache-manifest.15fbda1f7dc711dc8dea8f8f884d547d.js",
     "service-worker.js": "/XIVSim/service-worker.js",
     "static/css/main.523f09c5.chunk.css.map": "/XIVSim/static/css/main.523f09c5.chunk.css.map",
-    "static/js/2.ddfc35e6.chunk.js.LICENSE.txt": "/XIVSim/static/js/2.ddfc35e6.chunk.js.LICENSE.txt"
+    "static/js/2.ba7311ae.chunk.js.LICENSE.txt": "/XIVSim/static/js/2.ba7311ae.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.44e62228.js",
-    "static/js/2.ddfc35e6.chunk.js",
+    "static/js/2.ba7311ae.chunk.js",
     "static/css/main.523f09c5.chunk.css",
-    "static/js/main.c32b2ea3.chunk.js"
+    "static/js/main.b9b7bad8.chunk.js"
   ]
 }
