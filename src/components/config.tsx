@@ -1,16 +1,19 @@
-import { Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, TextField, Divider, Icon, IconButton, Button } from '@material-ui/core';
+import { Button, Divider, Grid, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { Add, Delete } from '@material-ui/icons';
 import DragHandleIcon from "@material-ui/icons/DragHandle";
 import arrayMove from "array-move";
 import React, { useState } from 'react';
 import { Container, Draggable } from "react-smooth-dnd";
 import { ConfigOption } from '../interfaces/configoption';
 import Skill from '../sim/jobs/skill';
-import { Delete, Add } from '@material-ui/icons';
 
 const useStyles = makeStyles({
   table: {
     minWidth: 480,
+  },
+  unselectable: {
+    userSelect: 'none',
   },
 });
 
@@ -53,7 +56,7 @@ export default function Config(props: { config: ConfigOption[], opener: Skill[] 
             <Container dragHandleSelector=".drag-handle" lockAxis="y" onDrop={onDrop}>
               {props.opener.map((item, index) => (
                 <Draggable key={index}>
-                  <ListItem>
+                  <ListItem className={classes.unselectable} >
                     {item.iconPath && (<ListItemIcon><img src={item.iconPath}></img></ListItemIcon>)}
                     <ListItemText primary={item.name} />
                     <ListItemSecondaryAction>

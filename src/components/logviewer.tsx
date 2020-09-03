@@ -1,9 +1,16 @@
-import { ListItem, ListItemText, Paper, Typography } from "@material-ui/core";
-import { render } from "@testing-library/react";
+import { List, ListItem, ListItemText, Paper, withStyles } from "@material-ui/core";
 import React, { Component } from "react";
-import { FixedSizeList, ListChildComponentProps } from "react-window";
+import { ListChildComponentProps } from "react-window";
 import DamageLog from "../sim/jobs/damagelog";
 import { Summary } from "../sim/jobs/simdata";
+
+const useStyles = () => ({
+    displayBox: {
+        overflow: 'auto',
+        maxHeight: 400,
+
+    },
+});
 
 class LogViewer extends Component<any, { selection: number, logs: { logs: DamageLog[], summary: Summary }[] }> {
     constructor(props: { selection: number, logs: { logs: DamageLog[], summary: Summary }[] }) {
@@ -61,13 +68,43 @@ class LogViewer extends Component<any, { selection: number, logs: { logs: Damage
         );
     }
 
+    renderRowAll(item: DamageLog, index: number) {
+
+        const timestamp = msToTime(item.timestamp)
+
+        let name = item.name
+
+        if (item.damage > 0) {
+            let dmgAmount: string = item.damage.toString()
+            if (item.crit) {
+                dmgAmount = `*${dmgAmount}*`
+            }
+            if (item.directHit) {
+                dmgAmount = `${dmgAmount} (Direct Hit)`
+            }
+            name += ' ' + dmgAmount
+        }
+
+
+        return (
+            <ListItem key={index}>
+                <ListItemText>[{timestamp}] {name}</ListItemText>
+            </ListItem>
+        );
+    }
+
     render() {
+        const { classes } = this.props;
         return (
             <>
-                <Paper>
-                    <FixedSizeList height={400} width='auto' itemSize={30} itemCount={this.state.logs[this.state.selection].logs.length}>
+                <Paper className={classes.displayBox}>
+                    {/*<FixedSizeList height={400} width='auto' itemSize={30} itemCount={this.state.logs[this.state.selection].logs.length}>
                         {this.renderRow}
-                    </FixedSizeList>
+        </FixedSizeList>*/}
+                    <List dense>
+                        {this.state.logs[this.state.selection].logs.map((item, index) => (this.renderRowAll(item, index))
+                        )}
+                    </List>
                 </Paper>
             </>
         );
@@ -91,4 +128,4 @@ function msToTime(s): string {
     return pad(hrs) + ':' + pad(mins) + ':' + pad(secs) + '.' + pad(ms);
 }
 
-export default LogViewer
+export default withStyles(useStyles)(LogViewer)

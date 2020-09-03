@@ -66,7 +66,7 @@ class DNCDemo extends Component<{}, { tabAnchor: null | HTMLElement, tab: number
 
     console.log(this.state.opener)
 
-    let sim: DNCSim = new DNCSim(configToPlayer(), levelMod80, 400, JSON.parse(JSON.stringify(this.state.opener)))
+    let sim: DNCSim = new DNCSim(configToPlayer(), levelMod80, 400, [...this.state.opener])
 
     sim.run()
 
